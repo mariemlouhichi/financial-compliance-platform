@@ -33,6 +33,14 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
+# Console Windows en cp1252 : les accents et pictogrammes des messages
+# lèveraient un UnicodeEncodeError, ce qui masquerait de vraies erreurs.
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 BASE = Path(__file__).resolve().parent
 FEEDBACK_FILE = BASE / "output" / "supervisor_feedback.jsonl"
 STATE_DIR = BASE / "output" / "retraining"

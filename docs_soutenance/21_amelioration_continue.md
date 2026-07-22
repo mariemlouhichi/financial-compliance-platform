@@ -13,11 +13,14 @@ différente, et il est important de ne pas les confondre devant un jury :
 | Mécanisme | État | Ce qu'il fait |
 |---|---|---|
 | **Apprentissage de règles** (graphe Neo4j) | ✅ **Fonctionnel** | Le graphe s'enrichit à chaque transaction analysée |
-| **Réentraînement du modèle ML** (RLHF) | ⚠️ **Amorce posée, non branchée** | Le feedback est collecté, mais rien ne réentraîne encore |
+| **Boucle de feedback RLHF** (collecte, mesure, décision, planification) | ✅ **Fonctionnelle** | Cycle hebdomadaire automatisé, avec garde-fous |
+| **Exécution du réentraînement du modèle** | ⚠️ **Conditionnée au jeu d'entraînement** | Se déclenche si les données sont disponibles ; sinon le feedback continue de s'accumuler |
 
-Annoncer « notre système fait du reinforcement learning » serait faux. Annoncer
-« notre système apprend » est vrai — mais il apprend **des règles**, pas encore
-des poids de modèle. C'est cette nuance qui doit être tenue.
+La formulation juste est donc : **la boucle est fermée et automatisée**, mais
+l'étape finale — le réentraînement effectif des poids — ne s'exécute que si le
+jeu d'entraînement est présent dans l'environnement. Ce qui est décidé,
+mesuré et planifié fonctionne ; ce qui dépend de données volumineuses est
+conditionnel.
 
 ---
 
@@ -111,22 +114,79 @@ utilisateurs.
 
 ---
 
-## 4. Ce qui manque — à dire honnêtement
+## 4. La boucle automatisée (`retraining.py` + `api/scheduler.py`)
 
-**Aucun code ne relit `supervisor_feedback.jsonl` pour réentraîner le modèle.**
+Le cycle se déroule en cinq temps, et produit à chaque exécution un rapport
+auditable dans `output/retraining/`.
 
-Le fichier `decision_workflow.py` le documente lui-même : *« le seam
-d'amélioration continue est posé »* — le point d'ancrage existe, la boucle n'est
-pas fermée. Les modèles ML (`aml_ml_*.json`) sont entraînés **hors ligne**, par
-un script lancé manuellement.
+```
+1. AGRÉGATION   lire supervisor_feedback.jsonl, joindre aux dossiers persistés
+2. MESURE       taux d'accord système/expert, taux de fausses alertes
+3. DÉCISION     réentraîner seulement si volume suffisant OU dérive avérée
+4. GARDE-FOU    ne déployer que si les métriques s'améliorent
+5. TRACE        rapport horodaté + état persistant
+```
 
-Ce qui manque précisément :
+### La politique de déclenchement
 
-1. un **consommateur** qui lit le feedback, le joint aux transactions
-   correspondantes et constitue un jeu d'entraînement incrémental ;
-2. une étape de **réentraînement + recalibration du seuil** ;
-3. un **rechargement à chaud** du modèle dans l'API ;
-4. un **planificateur** qui déclenche tout cela périodiquement.
+| Condition | Décision |
+|---|---|
+| Moins de **20 étiquettes** | **Pas de réentraînement** — l'échantillon n'est pas significatif |
+| Taux de fausses alertes > **30 %** | **Réentraînement anticipé** — dérive avérée |
+| Sinon | Cycle hebdomadaire nominal |
+
+Le seuil de volume est le point important : réentraîner sur huit décisions
+ferait apprendre du bruit. Le système **refuse explicitement** de le faire et
+le justifie dans son rapport, plutôt que de produire un modèle instable.
+
+### Le planificateur
+
+Trois tâches, sans dépendance supplémentaire (un thread et une boucle de
+réveil suffisent pour une cadence hebdomadaire) :
+
+| Tâche | Cadence | Rôle |
+|---|---|---|
+| `retraining` | dimanche 02 h | Cycle complet d'amélioration continue |
+| `drift_check` | quotidien 03 h | Garde-fou : déclenche un cycle anticipé si dérive |
+| `weekly_report` | vendredi 17 h | Envoi automatique du rapport hebdomadaire |
+
+Deux propriétés de robustesse :
+
+- **L'état est persisté** : un redémarrage ne rejoue pas une tâche déjà faite
+  dans la période, et ne la saute pas non plus. Si le serveur était éteint à
+  l'heure prévue, la tâche s'exécute au redémarrage (rattrapage).
+- **Aucune exception ne remonte** : une tâche en échec est journalisée, le
+  planificateur ne peut pas faire tomber l'API.
+
+Deux endpoints permettent de l'observer et de le démontrer :
+`GET /api/scheduler/status` et `POST /api/scheduler/run/{tâche}`.
+
+### Résultat observé sur les données réelles
+
+Exécution du cycle sur les 8 décisions superviseur enregistrées :
+
+```
+Étiquettes exploitables : 8
+  décision correcte     : 2
+  fausse alerte         : 1
+  fraude confirmée      : 5
+Accord système/expert   : 87,5 %
+Taux de fausses alertes : 12,5 %   (seuil d'alerte 30 %)
+
+Réentraînement : NON
+  motif : volume insuffisant (8 étiquettes pour un minimum de 20)
+```
+
+C'est exactement le comportement attendu : le système mesure, conclut que
+l'échantillon est trop faible, et s'abstient — en le justifiant.
+
+### Ce qui reste conditionnel
+
+L'**exécution effective du réentraînement** requiert le jeu d'entraînement
+(le dataset IBM, non embarqué dans le conteneur pour des raisons de taille).
+Quand il est absent, le cycle le signale explicitement (`statut : IGNORÉ`) et
+le feedback continue de s'accumuler pour le cycle suivant. Le
+**rechargement à chaud** du modèle dans l'API reste également à câbler.
 
 ---
 
@@ -198,14 +258,18 @@ Une formulation honnête et défendable :
 > « Le système comporte deux boucles d'apprentissage. La première, l'enrichissement
 > du graphe de connaissances, est **opérationnelle** : chaque transaction analysée
 > peut ajouter des règles validées, et le graphe répond de plus en plus souvent
-> sans solliciter le corpus. La seconde, le réentraînement du modèle ML à partir
-> des retours du superviseur, est **préparée mais pas encore fermée** : les
-> événements de feedback sont collectés et structurés, le point d'ancrage est
-> posé dans le code, et la cadence retenue serait hebdomadaire avec un garde-fou
-> anti-dérive. C'est la prochaine brique. »
+> sans solliciter le corpus. La seconde, l'exploitation des retours du
+> superviseur, est **automatisée** : un planificateur exécute chaque semaine un
+> cycle qui agrège le feedback, mesure l'accord système/expert et le taux de
+> fausses alertes, puis décide s'il y a lieu de réentraîner — avec un refus
+> explicite quand l'échantillon est trop faible, et un garde-fou quotidien
+> déclenchant un cycle anticipé en cas de dérive. Seule l'exécution finale du
+> réentraînement reste conditionnée à la disponibilité du jeu d'entraînement,
+> trop volumineux pour être embarqué. »
 
 Cette formulation a deux avantages : elle est exacte, et elle montre que la
-limite a été **identifiée et pensée**, pas subie.
+politique de déclenchement a été **pensée** — c'est elle qu'un jury interrogera,
+bien plus que la mécanique du réentraînement lui-même.
 
 ---
 

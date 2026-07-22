@@ -107,3 +107,7 @@ aml_ml_v4_final_*
 aml_ml_lgb.txt
 aml_ml_xgb.json
 aml_ml_meta.json
+
+# Artefacts d'exécution du planificateur et des cycles de réentraînement
+output/retraining/
+output/scheduler_state.json

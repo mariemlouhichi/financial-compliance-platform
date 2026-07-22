@@ -74,6 +74,8 @@ from api.auth import (auth_router, init_db as auth_init_db, current_user,
                       send_weekly_report_email)
 # Persistance des dossiers : PostgreSQL si disponible, sinon repli fichiers JSON
 from api.store import get_store
+# Planificateur des tâches périodiques (réentraînement, rapport hebdomadaire)
+from api.scheduler import SCHEDULER, Job, FRIDAY, SUNDAY
 
 try:
     from neo4j import GraphDatabase
@@ -755,12 +757,107 @@ app.add_middleware(
 app.include_router(auth_router)   # /api/auth/register · verify · login · me
 
 
+def _job_retraining_cycle() -> dict:
+    """Cycle hebdomadaire d'amélioration continue (feedback superviseur)."""
+    from retraining import run_cycle
+    report = run_cycle()
+    return {
+        "labelled": report["stats"]["labelled"],
+        "agreement_rate": report["stats"]["agreement_rate"],
+        "false_positive_rate": report["stats"]["false_positive_rate"],
+        "retrain": report["decision"]["retrain"],
+        "reason": report["decision"]["reason"],
+        "training_status": report["training"]["status"],
+    }
+
+
+def _job_drift_check() -> dict:
+    """Contrôle quotidien : ne réentraîne que si une dérive est avérée.
+
+    C'est le garde-fou qui évite d'attendre le cycle hebdomadaire quand le
+    taux de fausses alertes s'envole.
+    """
+    from retraining import load_feedback, enrich_with_transactions, measure, FP_ALERT
+    stats = measure(enrich_with_transactions(load_feedback()))
+    drift = stats["labelled"] > 0 and stats["false_positive_rate"] > FP_ALERT
+    if drift:
+        print(f"  [SCHED] dérive détectée "
+              f"({stats['false_positive_rate']:.1%} de fausses alertes) "
+              f"→ cycle de réentraînement anticipé")
+        return {"drift": True, **_job_retraining_cycle()}
+    return {"drift": False, **stats}
+
+
+def _job_weekly_report() -> dict:
+    """Rapport hebdomadaire envoyé automatiquement au responsable conformité."""
+    stats = _weekly_stats(7)
+    dest = os.getenv("WEEKLY_REPORT_TO", "").strip()
+    if not dest:
+        dest = _default_report_recipient()
+    if not dest:
+        return {"sent": False, "reason": "aucun destinataire déterminé"}
+    send_weekly_report_email(dest, stats)
+    return {"sent": True, "recipient": dest, "total": stats.get("total")}
+
+
+def _default_report_recipient() -> str:
+    """Premier Compliance Officer (à défaut, admin) enregistré."""
+    try:
+        from api.auth import _db, _db_lock
+        with _db_lock, _db() as conn:
+            row = conn.execute(
+                "SELECT email FROM users WHERE role='COMPLIANCE_OFFICER' "
+                "AND email IS NOT NULL ORDER BY rowid LIMIT 1").fetchone()
+            if not row:
+                row = conn.execute(
+                    "SELECT email FROM users WHERE role='ADMIN' "
+                    "AND email IS NOT NULL ORDER BY rowid LIMIT 1").fetchone()
+        return row["email"] if row else ""
+    except Exception:
+        return ""
+
+
 @app.on_event("startup")
 def _startup():
     auth_init_db()   # table users (SQLite platform.db)
     _load_jobs()     # historique des dossiers (survit aux redémarrages)
+
+    # ── Tâches périodiques (Tâche 1) ────────────────────────────────
+    #  Cadence RETENUE : hebdomadaire pour le réentraînement — sur 3 jours le
+    #  volume d'étiquettes humaines est trop faible et le modèle apprendrait
+    #  du bruit. Un contrôle quotidien permet un déclenchement anticipé si le
+    #  taux de fausses alertes dérive.
+    SCHEDULER.register(Job(
+        name="retraining", func=_job_retraining_cycle,
+        weekday=SUNDAY, hour=2, label="Cycle de réentraînement (RLHF)"))
+    SCHEDULER.register(Job(
+        name="drift_check", func=_job_drift_check,
+        weekday=None, hour=3, label="Contrôle de dérive (quotidien)"))
+    SCHEDULER.register(Job(
+        name="weekly_report", func=_job_weekly_report,
+        weekday=FRIDAY, hour=17, label="Rapport hebdomadaire par email"))
+    SCHEDULER.start()
+
     # Init en arrière-plan pour ne pas bloquer le démarrage du serveur
     threading.Thread(target=init_components, daemon=True).start()
+
+
+@app.get("/api/scheduler/status")
+def scheduler_status(authorization: Optional[str] = Header(None)):
+    """État du planificateur : tâches, dernières exécutions, historique."""
+    user = current_user(authorization)
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN", "AUDITOR"):
+        raise HTTPException(403, "Accès réservé à la conformité et à l'audit.")
+    return SCHEDULER.status()
+
+
+@app.post("/api/scheduler/run/{job_name}")
+def scheduler_run(job_name: str, authorization: Optional[str] = Header(None)):
+    """Déclenche manuellement une tâche planifiée (démonstration au jury)."""
+    user = current_user(authorization)
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
+        raise HTTPException(403, "Accès réservé à la conformité.")
+    return SCHEDULER.run_job(job_name, manual=True)
 
 
 @app.get("/api/health")
