@@ -34,7 +34,12 @@ torch==2.13.0
 
 # ── Machine learning (inférence + explicabilité) ───────────────────────────
 lightgbm==4.6.0
-xgboost==3.2.0
+# xgboost-cpu, PAS xgboost : sur Linux, le paquet standard déclare
+# nvidia-nccl-cu12 en dépendance obligatoire (303 Mo de bibliothèques GPU)
+# pour ses fonctions multi-GPU, inutilisées ici. La variante CPU officielle
+# fournit le MÊME module `xgboost` en version identique, sans aucune
+# dépendance CUDA.
+xgboost-cpu==3.2.0
 shap==0.52.0
 scikit-learn==1.5.2
 numpy>=2.4.4
