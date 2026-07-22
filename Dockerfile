@@ -50,7 +50,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #  variante CUDA (nvidia-*, cuda-toolkit, triton) — environ 4 Go inutiles.
 RUN pip install --upgrade pip
 
+#  NOTE : le fichier téléchargé est conservé sous un nom neutre dans le cache,
+#  puis COPIÉ sous son nom normalisé PEP 427 avant l'installation. pip refuse
+#  en effet un fichier nommé « torch.whl » (« Invalid wheel filename »), et on
+#  ne veut surtout pas retélécharger 182 Mo juste pour un renommage.
 ARG TORCH_URL=https://download.pytorch.org/whl/cpu/torch-2.13.0%2Bcpu-cp313-cp313-manylinux_2_28_x86_64.whl
+ARG TORCH_WHEEL=torch-2.13.0+cpu-cp313-cp313-manylinux_2_28_x86_64.whl
 ARG TORCH_SIZE=191815667
 RUN --mount=type=cache,target=/wheels,sharing=locked <<'SH'
 set -eu
@@ -64,18 +69,29 @@ for i in $(seq 1 40); do
 done
 SZ=$(stat -c%s "$DEST" 2>/dev/null || echo 0)
 [ "$SZ" = "$TORCH_SIZE" ] || { echo "torch incomplet ($SZ octets) — relance le build"; exit 1; }
-pip install "$DEST"
+cp "$DEST" "/tmp/$TORCH_WHEEL"
+pip install "/tmp/$TORCH_WHEEL"
+rm -f "/tmp/$TORCH_WHEEL"
 SH
 
 ARG TVISION_URL=https://download.pytorch.org/whl/cpu/torchvision-0.28.0%2Bcpu-cp313-cp313-manylinux_2_28_x86_64.whl
+ARG TVISION_WHEEL=torchvision-0.28.0+cpu-cp313-cp313-manylinux_2_28_x86_64.whl
+ARG TVISION_SIZE=1846831
 RUN --mount=type=cache,target=/wheels,sharing=locked <<'SH'
 set -eu
-DEST=/wheels/torchvision.whl
+DEST=/wheels/torchvision.download
 for i in $(seq 1 20); do
+    SZ=$(stat -c%s "$DEST" 2>/dev/null || echo 0)
+    [ "$SZ" = "$TVISION_SIZE" ] && break
+    echo "  torchvision : $SZ / $TVISION_SIZE octets — tentative $i (reprise)"
     curl -fL --retry 5 --retry-all-errors --retry-delay 5 \
-         --connect-timeout 30 -C - -o "$DEST" "$TVISION_URL" && break || true
+         --connect-timeout 30 -C - -o "$DEST" "$TVISION_URL" || true
 done
-pip install "$DEST"
+SZ=$(stat -c%s "$DEST" 2>/dev/null || echo 0)
+[ "$SZ" = "$TVISION_SIZE" ] || { echo "torchvision incomplet ($SZ octets)"; exit 1; }
+cp "$DEST" "/tmp/$TVISION_WHEEL"
+pip install "/tmp/$TVISION_WHEEL"
+rm -f "/tmp/$TVISION_WHEEL"
 SH
 
 #  Le cache pip conserve les roues déjà téléchargées : une reprise après
