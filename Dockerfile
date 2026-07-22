@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # ============================================================================
 #  Image de l'API AML/KYC (FastAPI + pipeline d'analyse multi-agent)
 #
@@ -34,15 +35,54 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ── Dépendances Python ─────────────────────────────────────────────────────
 #  torch CPU EN PREMIER : sinon pip résout la variante CUDA (~2 Go inutiles).
-#  torch ET torchvision depuis l'index CPU, EN PREMIER : docling dépend de
-#  torchvision, et sans ce pré-positionnement pip installerait la variante CUDA
-#  (nvidia-*, cuda-toolkit, triton) — environ 4 Go inutiles sans GPU.
+#  ── Stratégie de téléchargement adaptée à une connexion lente/instable ──
+#  torch pèse 191 Mo et pip ne sait PAS reprendre un téléchargement interrompu :
+#  une coupure à 90 % relance tout depuis zéro. Trois protections :
+#
+#   1. un CACHE BuildKit sur /wheels → le fichier partiel SURVIT entre deux
+#      builds, donc une nouvelle tentative reprend là où elle s'est arrêtée ;
+#   2. curl -C - (reprise) en boucle, le serveur PyTorch accepte les ranges ;
+#   3. des ÉTAPES SÉPARÉES : torch, puis torchvision, puis le reste — une
+#      étape réussie est mise en cache et n'est jamais refaite.
+#
+#  torch et torchvision sont installés EN PREMIER depuis l'index CPU car
+#  docling dépend de torchvision : sans ce pré-positionnement, pip tirerait la
+#  variante CUDA (nvidia-*, cuda-toolkit, triton) — environ 4 Go inutiles.
+RUN pip install --upgrade pip
+
+ARG TORCH_URL=https://download.pytorch.org/whl/cpu/torch-2.13.0%2Bcpu-cp313-cp313-manylinux_2_28_x86_64.whl
+ARG TORCH_SIZE=191815667
+RUN --mount=type=cache,target=/wheels,sharing=locked <<'SH'
+set -eu
+DEST=/wheels/torch.whl
+for i in $(seq 1 40); do
+    SZ=$(stat -c%s "$DEST" 2>/dev/null || echo 0)
+    [ "$SZ" = "$TORCH_SIZE" ] && break
+    echo "  torch : $SZ / $TORCH_SIZE octets — tentative $i (reprise)"
+    curl -fL --retry 5 --retry-all-errors --retry-delay 5 \
+         --connect-timeout 30 -C - -o "$DEST" "$TORCH_URL" || true
+done
+SZ=$(stat -c%s "$DEST" 2>/dev/null || echo 0)
+[ "$SZ" = "$TORCH_SIZE" ] || { echo "torch incomplet ($SZ octets) — relance le build"; exit 1; }
+pip install "$DEST"
+SH
+
+ARG TVISION_URL=https://download.pytorch.org/whl/cpu/torchvision-0.28.0%2Bcpu-cp313-cp313-manylinux_2_28_x86_64.whl
+RUN --mount=type=cache,target=/wheels,sharing=locked <<'SH'
+set -eu
+DEST=/wheels/torchvision.whl
+for i in $(seq 1 20); do
+    curl -fL --retry 5 --retry-all-errors --retry-delay 5 \
+         --connect-timeout 30 -C - -o "$DEST" "$TVISION_URL" && break || true
+done
+pip install "$DEST"
+SH
+
+#  Le cache pip conserve les roues déjà téléchargées : une reprise après
+#  coupure ne retélécharge que ce qui manque réellement.
 COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install --retries 5 --timeout 60 \
-        torch==2.13.0 torchvision==0.28.0 \
-        --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --retries 5 --timeout 60 -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --retries 20 --timeout 120 -r requirements.txt
 
 # ── Code applicatif ────────────────────────────────────────────────────────
 #  Le .dockerignore exclut venv/, node_modules/, entities.ftm.json (853 Mo),
