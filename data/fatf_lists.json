@@ -1,0 +1,62 @@
+{
+  "black_list": [
+    "KP",
+    "IR",
+    "MM"
+  ],
+  "grey_list": [
+    "DZ",
+    "AO",
+    "BO",
+    "BG",
+    "CM",
+    "CI",
+    "CD",
+    "HT",
+    "KE",
+    "KW",
+    "LA",
+    "LB",
+    "MC",
+    "NA",
+    "NP",
+    "PG",
+    "SS",
+    "SY",
+    "VE",
+    "VN",
+    "VG",
+    "YE"
+  ],
+  "black_names": {
+    "KP": "Democratic People's Republic of Korea",
+    "IR": "Iran",
+    "MM": "Myanmar"
+  },
+  "grey_names": {
+    "DZ": "Algeria",
+    "AO": "Angola",
+    "BO": "Bolivia",
+    "BG": "Bulgaria",
+    "CM": "Cameroon",
+    "CI": "Cote d'Ivoire",
+    "CD": "Democratic Republic of Congo",
+    "HT": "Haiti",
+    "KE": "Kenya",
+    "KW": "Kuwait",
+    "LA": "Lao PDR",
+    "LB": "Lebanon",
+    "MC": "Monaco",
+    "NA": "Namibia",
+    "NP": "Nepal",
+    "PG": "Papua New Guinea",
+    "SS": "South Sudan",
+    "SY": "Syria",
+    "VE": "Venezuela",
+    "VN": "Vietnam",
+    "VG": "Virgin Islands (UK)",
+    "YE": "Yemen"
+  },
+  "last_updated": "2026-02-13",
+  "source": "_Black and grey_ lists.pdf (page FATF du 06/05/2026)"
+}

@@ -1,0 +1,21 @@
+{
+  "query": "KYC obligations for PEP",
+  "tx_type": "SWIFT",
+  "jurisdiction": "Tunisia",
+  "cache_hit": true,
+  "step0_ms": 1857.4299812316895,
+  "step1_ms": 0.0,
+  "step2_bm25_ms": 0.0,
+  "step2_vector_ms": 0.0,
+  "step3_ms": 0.0,
+  "step4_ms": 0.0,
+  "step5_ms": 0.0,
+  "total_ms": 1857.4395179748535,
+  "prefilter_docs": 0,
+  "bm25_count": 0,
+  "vector_count": 0,
+  "fused_count": 0,
+  "expanded_with_context": 0,
+  "final_count": 5,
+  "embed_cache_hit": false
+}

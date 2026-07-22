@@ -1,0 +1,224 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  AML/KYC Agentic RAG — Infrastructure complète
+#
+#  Lance Weaviate (Phase 3) + Neo4j (Phase 4) en un seul fichier.
+#
+#  COMMANDES :
+#    docker compose up -d              → démarre tout
+#    docker compose up -d weaviate     → Weaviate seul
+#    docker compose up -d neo4j        → Neo4j seul
+#    docker compose ps                 → statut des services
+#    docker compose logs -f neo4j      → suivi logs Neo4j
+#    docker compose down               → arrête tout (données conservées)
+#    docker compose down -v            → arrête + SUPPRIME les volumes (données perdues)
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  Weaviate — Base vectorielle (Phase 3)
+  # ────────────────────────────────────────────────────────────────────────
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.28.4
+    container_name: aml_weaviate
+    ports:
+      - "8088:8080"     # HTTP (8080 occupé par Oracle TNS Listener sur la machine de dev)
+      - "50051:50051"   # gRPC (batch import)
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      ENABLE_MODULES: ""
+      CLUSTER_HOSTNAME: "node1"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    networks:
+      - aml_network
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  Neo4j — Base graphe (Phase 4)
+  # ────────────────────────────────────────────────────────────────────────
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: aml_neo4j
+    ports:
+      - "7474:7474"     # Browser HTTP (interface web)
+      - "7687:7687"     # Bolt (driver Python)
+    environment:
+      # Identifiants : neo4j / amlkyc2025
+      NEO4J_AUTH: neo4j/amlkyc2025
+
+      # Memory tuning — adapté à machine de dev 8 Go RAM
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 512m
+
+      # Listen sur toutes interfaces (dev local)
+      NEO4J_server_bolt_listen__address: "0.0.0.0:7687"
+      NEO4J_server_http_listen__address: "0.0.0.0:7474"
+
+      # Désactive l'avertissement password
+      NEO4J_dbms_security_auth__minimum__password__length: 8
+
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/import
+    networks:
+      - aml_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7474 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  Redis — Mémoire glissante historique client (Point 5)
+  #  Fenêtre 24-72h (structuring intraday) + agrégats 30-90j (profil).
+  #  Le code dégrade gracieusement en mémoire si Redis est absent.
+  # ────────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: aml_redis
+    ports:
+      - "6379:6379"     # client Python : REDIS_URL=redis://localhost:6379/0
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - aml_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  PostgreSQL — Base transactionnelle des dossiers (Tâche 4)
+  #  Persistance durable + requêtes complexes (montant/période/décision/client).
+  #  Le code (api/store.py) dégrade gracieusement en fichiers JSON si absent.
+  #  DSN local : postgresql://aml:amlkyc2025@localhost:5432/amlkyc
+  # ────────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: aml_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: aml
+      POSTGRES_PASSWORD: amlkyc2025
+      POSTGRES_DB: amlkyc
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aml_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aml -d amlkyc"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  API — FastAPI + pipeline multi-agent (Phase 2)
+  #  Le corpus PDF (68 Mo) et les secrets sont MONTÉS, pas copiés dans l'image.
+  # ────────────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aml_api
+    ports:
+      - "8001:8001"
+    environment:
+      # Les services se joignent par leur nom sur le réseau Docker
+      DATABASE_URL: postgresql://aml:amlkyc2025@postgres:5432/amlkyc
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: amlkyc2025
+      # ⚠️ Port INTERNE de Weaviate = 8080 (8088 n'est que le mapping hôte)
+      WEAVIATE_HOST: weaviate
+      WEAVIATE_HTTP_PORT: "8080"
+      WEAVIATE_GRPC_PORT: "50051"
+      REDIS_URL: redis://redis:6379/0
+      REG_DIR: /corpus
+    volumes:
+      # Corpus réglementaire en lecture seule (hors contexte de build)
+      - ../PFE_AML_KYC/01_regulations:/corpus:ro
+      # Secrets et base des comptes — jamais dans l'image
+      - ./groq_keys.json:/app/groq_keys.json:ro
+      - ./smtp_config.json:/app/smtp_config.json:ro
+      - ./platform.db:/app/platform.db
+      # Données produites (rapports SAR, cache)
+      - api_output:/app/output
+      - api_sars:/app/sars
+      # Cache des modèles Hugging Face : évite un re-téléchargement à chaque
+      # redémarrage du conteneur (embeddings BGE, modèles docling)
+      - api_hf_cache:/app/.cache/huggingface
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    networks:
+      - aml_network
+    restart: unless-stopped
+
+  # ────────────────────────────────────────────────────────────────────────
+  #  WEB — interface React servie par nginx, qui relaie /api vers l'API.
+  #  Un seul point d'entrée public → pas de CORS.
+  #  Interface accessible sur http://localhost:8080
+  # ────────────────────────────────────────────────────────────────────────
+  web:
+    build:
+      context: ./project
+      dockerfile: Dockerfile
+      args:
+        # Vide = appels en chemin relatif (/api/...) relayés par nginx
+        VITE_API_BASE_URL: ""
+    container_name: aml_web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - aml_network
+    restart: unless-stopped
+
+# ────────────────────────────────────────────────────────────────────────────
+#  Réseau partagé (utile Phase 5 — Weaviate ↔ Neo4j si déploiement serveur)
+# ────────────────────────────────────────────────────────────────────────────
+networks:
+  aml_network:
+    name: aml_network
+    driver: bridge
+
+# ────────────────────────────────────────────────────────────────────────────
+#  Volumes nommés — persistance après redémarrage
+# ────────────────────────────────────────────────────────────────────────────
+volumes:
+  weaviate_data:
+    name: aml_weaviate_data
+  neo4j_data:
+    name: aml_neo4j_data
+  neo4j_logs:
+    name: aml_neo4j_logs
+  neo4j_import:
+    name: aml_neo4j_import
+  redis_data:
+    name: aml_redis_data
+  postgres_data:
+    name: aml_postgres_data
+  api_output:
+    name: aml_api_output
+  api_sars:
+    name: aml_api_sars
+  api_hf_cache:
+    name: aml_api_hf_cache

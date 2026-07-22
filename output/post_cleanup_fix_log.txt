@@ -1,0 +1,50 @@
+Post-Cleanup Fix — 2026-05-14T02:08:51.332968
+Avant: 7535 chunks | Après: 6636 chunks
+Stats: {'fields_removed': 7535, 'threshold_fixed_true': 225, 'role_corrected': 139, 'threshold_synced': 725, 'role_set_threshold': 7, 'threshold_fixed_false': 277, 'table_fragments_removed': 23, 'short_chunks_merged': 162, 'short_chunks_deleted': 0, 'cut_sentences_merged': 714}
+
+Détail:
+TABLE_REMOVED: mework of exceptional measures in favor of businesses and professionals provided
+TABLE_REMOVED: urities deferred in dinars within the framework of exceptional measures provided
+TABLE_REMOVED: 2020-12 of May 28, 2020, concerning exceptional financing to support businesses 
+TABLE_REMOVED: **Overview of the characteristics of the monetary policy operations of the Centr
+TABLE_REMOVED: eral Procedures** |
+| | | **Foreign Exchange Swaps** | **Foreign Exchange Swaps*
+TABLE_REMOVED: | 10%-25%                               | 1% of the excess amo                  
+TABLE_REMOVED: n class 4 greater than or equal to 3 years**
+**(in thousands of dinars unless ot
+TABLE_REMOVED: ncial Institutions No. 2018-06 of June 5, 2018**
+**relating to the Schedule of P
+TABLE_REMOVED: | 1.5% of the excess amount                |
+|                                  
+TABLE_REMOVED: | 10% - 20%                           | 1% of the capital requirement           
+TABLE_REMOVED: o English:
+
+**Establishment Subject to TABLE 3 - CREDIT RISK Declaration Date**
+
+TABLE_REMOVED: |             |           | **Appendix 2** to the Circular to Banks No. 2018-10 
+TABLE_REMOVED: 2017-06 concerning accounting, prudential, and statistical reporting to the Cent
+TABLE_REMOVED: abilities in Euro by residual maturity | BR+BNR | Annual | DR+45d | XML |
+| | RP
+TABLE_REMOVED: récapitulatif du respect des normes de concentration, de division des risques et
+TABLE_REMOVED: |---|---|---|---|---|---|---|
+| **4-Reporting on a consolidated basis**<br>(Amen
+TABLE_REMOVED: ............................ | | | | | | .................................... | 
+TABLE_REMOVED: | |
+| | |_|_|_|_| Postal Code | Medium term on special resources 09 | |
+| | | Lo
+TABLE_REMOVED: ----------
+
+**DECLARING BANK**
+
+**RECORD LAYOUT INTENDED FOR DECLARATIONS MADE O
+TABLE_REMOVED: |  |  |
+|  |  |  |  |  |  |  |  |  |
+|  |  |  |  |  |  |  |  |  |
+|  |  |  |  | 
+TABLE_REMOVED: NSACTIONS** **AUTHORIZED INTERMEDIARY: ---------------------------**
+
+**Week: Fr
+TABLE_REMOVED: NSACTIONS**
+**AUTHORIZED INTERMEDIARY: ---------------------------**
+**Week: Fro
+TABLE_REMOVED: nk **Exchange Operations of Tunisian Dinar for Libyan Dinar at Approved Banks an

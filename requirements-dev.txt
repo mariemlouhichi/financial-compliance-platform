@@ -1,0 +1,15 @@
+# ============================================================================
+#  Dépendances de DÉVELOPPEMENT : entraînement des modèles et tests.
+#  Volontairement séparées du runtime pour ne pas alourdir l'image Docker.
+#
+#      pip install -r requirements.txt -r requirements-dev.txt
+# ============================================================================
+
+-r requirements.txt
+
+# ── Entraînement ML ────────────────────────────────────────────────────────
+optuna==4.9.0                # Recherche d'hyperparamètres (hors runtime)
+torchvision==0.28.0          # Utilisé par certains modèles de mise en page
+
+# ── Tests ──────────────────────────────────────────────────────────────────
+pytest==8.3.4

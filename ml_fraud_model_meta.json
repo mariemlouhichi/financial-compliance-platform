@@ -1,0 +1,33 @@
+{
+  "threshold": 0.9364225268363953,
+  "features": [
+    "amount",
+    "amount_log",
+    "currency_mismatch",
+    "is_cash",
+    "payment_format_code",
+    "hour",
+    "day_of_week",
+    "is_night",
+    "is_weekend",
+    "is_round_100",
+    "is_round_1000",
+    "just_below_10k",
+    "just_below_5k",
+    "amount_decimals",
+    "sender_tx_count",
+    "sender_amount_sum",
+    "sender_amount_mean",
+    "sender_amount_std",
+    "receiver_tx_count",
+    "receiver_amount_sum",
+    "receiver_amount_mean",
+    "sender_unique_receivers",
+    "receiver_unique_senders",
+    "amount_vs_sender_mean",
+    "pair_count",
+    "is_unique_pair",
+    "sender_fanout_ratio",
+    "receiver_fanin_ratio"
+  ]
+}

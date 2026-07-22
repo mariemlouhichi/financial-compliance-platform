@@ -1,0 +1,10 @@
+# Contexte de build du frontend — node_modules (139 Mo) est réinstallé
+# proprement par `npm ci` dans l'image.
+node_modules/
+dist/
+.vite/
+*.log
+.env
+.env.*
+Dockerfile
+.dockerignore

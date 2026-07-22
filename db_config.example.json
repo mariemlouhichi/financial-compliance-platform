@@ -1,0 +1,8 @@
+{
+  "_comment": "Copier en db_config.json (gitignoré). Ces valeurs correspondent au service postgres du docker-compose. Alternative recommandée en production : variable d'environnement DATABASE_URL (format fourni par Azure). Sans configuration, l'application bascule automatiquement sur une persistance en fichiers JSON.",
+  "host": "localhost",
+  "port": 5432,
+  "user": "aml",
+  "password": "REMPLACER_PAR_VOTRE_MOT_DE_PASSE",
+  "dbname": "amlkyc"
+}

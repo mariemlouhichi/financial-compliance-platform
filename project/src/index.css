@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  /* Quick win #2 : sensation de « finition » — transition sur tous les
+     boutons et liens cliquables, sans avoir à l'ajouter partout. */
+  button, a {
+    transition: background-color .15s ease, color .15s ease,
+                border-color .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(148 163 184);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(100 116 139);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODE SOMBRE — remapping des utilitaires récurrents sous le scope .dark
+   (piloté par theme.ts : classe .dark sur <html>). Approche « surcouche » :
+   les pages restent écrites en clair, la surcouche traduit les couleurs.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Fonds ------------------------------------------------------------- */
+.dark .bg-slate-100 { background-color: #0b1220; }          /* fond app */
+.dark .bg-white { background-color: #1e293b; }               /* cartes    */
+.dark .bg-white\/95 { background-color: rgba(30, 41, 59, .95); }
+.dark .bg-slate-50 { background-color: #16233a; }
+.dark .bg-slate-50\/60 { background-color: rgba(22, 35, 58, .6); }
+.dark .hover\:bg-slate-50:hover { background-color: #1c2b45; }
+.dark tr.hover\:bg-slate-50:hover { background-color: #1c2b45; }
+.dark .bg-indigo-50\/50 { background-color: rgba(99, 102, 241, .10); }
+
+/* Boutons sombres (pas la sidebar : on ne cible que button/a) -------- */
+.dark button.bg-slate-900, .dark a.bg-slate-900 { background-color: #4f46e5; }
+.dark button.bg-slate-900:hover, .dark a.bg-slate-900:hover { background-color: #6366f1; }
+
+/* Textes ------------------------------------------------------------- */
+.dark .text-slate-900 { color: #f1f5f9; }
+.dark .text-slate-800 { color: #e2e8f0; }
+.dark .text-slate-700 { color: #cbd5e1; }
+.dark .text-slate-600 { color: #a8b6c8; }
+.dark .text-slate-500 { color: #94a3b8; }
+.dark .text-slate-400 { color: #8494a7; }
+
+/* Bordures ----------------------------------------------------------- */
+.dark .border-slate-100 { border-color: #263248; }
+.dark .border-slate-200 { border-color: #334155; }
+.dark .border-slate-300 { border-color: #475569; }
+
+/* Bandeaux & badges colorés (teintes -50/-100 translucides) ---------- */
+.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, .12); }
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, .20); }
+.dark .bg-amber-50 { background-color: rgba(245, 158, 11, .12); }
+.dark .bg-amber-100 { background-color: rgba(245, 158, 11, .20); }
+.dark .bg-red-50 { background-color: rgba(239, 68, 68, .12); }
+.dark .bg-red-100 { background-color: rgba(239, 68, 68, .20); }
+.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, .14); }
+.dark .bg-indigo-50\/60 { background-color: rgba(99, 102, 241, .12); }
+.dark .bg-indigo-100 { background-color: rgba(99, 102, 241, .22); }
+.dark .bg-sky-100 { background-color: rgba(14, 165, 233, .20); }
+.dark .bg-blue-50 { background-color: rgba(59, 130, 246, .12); }
+.dark .bg-blue-100 { background-color: rgba(59, 130, 246, .20); }
+.dark .bg-violet-100 { background-color: rgba(139, 92, 246, .20); }
+.dark .bg-orange-100 { background-color: rgba(249, 115, 22, .20); }
+.dark .bg-teal-100 { background-color: rgba(20, 184, 166, .20); }
+.dark .bg-fuchsia-100 { background-color: rgba(217, 70, 239, .20); }
+.dark .bg-cyan-100 { background-color: rgba(8, 145, 178, .22); }
+
+.dark .border-emerald-200 { border-color: rgba(16, 185, 129, .40); }
+.dark .border-amber-200, .dark .border-amber-300 { border-color: rgba(245, 158, 11, .40); }
+.dark .border-red-200, .dark .border-red-300 { border-color: rgba(239, 68, 68, .40); }
+.dark .border-indigo-200, .dark .border-indigo-400 { border-color: rgba(99, 102, 241, .45); }
+.dark .border-blue-300 { border-color: rgba(59, 130, 246, .45); }
+.dark .border-orange-300 { border-color: rgba(249, 115, 22, .45); }
+.dark .border-teal-300 { border-color: rgba(20, 184, 166, .45); }
+
+.dark .text-emerald-800, .dark .text-emerald-700 { color: #34d399; }
+.dark .text-emerald-600 { color: #34d399; }
+.dark .text-amber-800, .dark .text-amber-700, .dark .text-amber-600 { color: #fbbf24; }
+.dark .text-red-800, .dark .text-red-700 { color: #f87171; }
+.dark .text-indigo-800, .dark .text-indigo-700, .dark .text-indigo-600, .dark .text-indigo-500 { color: #a5b4fc; }
+.dark .text-sky-700 { color: #7dd3fc; }
+.dark .text-blue-800 { color: #93c5fd; }
+.dark .text-violet-700 { color: #c4b5fd; }
+.dark .text-orange-800 { color: #fdba74; }
+.dark .text-teal-800 { color: #5eead4; }
+.dark .text-slate-300 { color: #cbd5e1; }
+
+/* Formulaires --------------------------------------------------------- */
+.dark input, .dark select, .dark textarea {
+  background-color: #0f1a2e;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+.dark input::placeholder, .dark textarea::placeholder { color: #64748b; }
+.dark input[readonly] { background-color: #16233a; color: #94a3b8; }
+.dark input[type='file'] { background-color: transparent; border-color: transparent; }
+.dark option { background-color: #0f1a2e; }
+.dark input[type='checkbox'] { background-color: #0f1a2e; }
+
+/* Divers --------------------------------------------------------------- */
+.dark .shadow-sm, .dark .shadow-lg, .dark .shadow-md {
+  --tw-shadow-color: rgba(0, 0, 0, .5);
+}
+.dark thead.sticky, .dark thead .bg-white { background-color: #1e293b; }
+.dark .sar-md th { background: #16233a; color: #94a3b8; }
+.dark .sar-md { color: #cbd5e1; }
+.dark .sar-md blockquote { background: rgba(99, 102, 241, .12); }
+.dark .sar-md code { background: #16233a; }
+.dark .sar-md td, .dark .sar-md th { border-color: #334155; }

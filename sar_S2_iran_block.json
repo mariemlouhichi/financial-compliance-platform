@@ -1,0 +1,178 @@
+{
+  "sar_id": "SAR-AD41E58A",
+  "generated_at": "2026-06-28T01:33:04.384236",
+  "declarant_bank": "Banque Tunisienne (PFE 2025-2026)",
+  "decision_trigger": "BLOCK",
+  "recommendation": "REFUSER — Sanctions ou interdictions BCT/ONU violées",
+  "risk_score_compliance": 100.0,
+  "risk_score_ml": 97.0,
+  "risk_score_combined": 100.0,
+  "risk_level": "CRITIQUE",
+  "transaction": {
+    "type": "SWIFT",
+    "amount": 21800,
+    "currency": "USD",
+    "sender": "Eric Badege",
+    "sender_country": "Congo",
+    "beneficiary": "Iran National Bank",
+    "beneficiary_country": "Iran",
+    "motive": "",
+    "has_justification": false,
+    "timestamp": "2026-05-19T03:15:00"
+  },
+  "client_profile": {
+    "client_id": "CLT-S2-001",
+    "level": "FAIBLE",
+    "score": 10.0,
+    "is_pep": false,
+    "kyc_complete": true,
+    "prior_strs": false
+  },
+  "client_risk_level": "FAIBLE",
+  "client_factors": [],
+  "fatca_obligation": "NONE",
+  "violated_rules": [
+    {
+      "rule_text": "Transactions avec pays sous sanctions ONU interdites — gel automatique des fonds requis",
+      "source": "bct_circulaire_2017_08_aml.pdf",
+      "is_bct_binding": true,
+      "article_ref": "Article 43",
+      "fatf_rec": "R6",
+      "severity": "CRITICAL",
+      "cross_validated": true,
+      "provenance": "SYMBOLIC"
+    },
+    {
+      "rule_text": "Iran figure sur la liste FATF des juridictions à haut risque (countermeasures)",
+      "source": "fatf_recommendations_2024.pdf",
+      "is_bct_binding": false,
+      "article_ref": "Recommendation 19",
+      "fatf_rec": "R19",
+      "severity": "CRITICAL",
+      "cross_validated": false,
+      "provenance": "SYMBOLIC"
+    },
+    {
+      "rule_text": "Obligation de déclaration de soupçon à la CTAF dans les 48h pour toute transaction suspecte",
+      "source": "bct_circulaire_2006_19.pdf",
+      "is_bct_binding": true,
+      "article_ref": "Article 12",
+      "fatf_rec": "R20",
+      "severity": "HIGH",
+      "cross_validated": false,
+      "provenance": "SYMBOLIC"
+    }
+  ],
+  "respected_rules": [
+    {
+      "rule_text": "Sanctions ONU vérifiées",
+      "source": "bct_circulaire_2017_08",
+      "is_bct_binding": true,
+      "article_ref": "Art.43",
+      "fatf_rec": "R6",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Vérification PEP",
+      "source": "bct_circulaire_2006_19",
+      "is_bct_binding": true,
+      "article_ref": "Art.5",
+      "fatf_rec": "R12",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Identification donneur d'ordre",
+      "source": "loi_2003_75",
+      "is_bct_binding": true,
+      "article_ref": "Art.7",
+      "fatf_rec": "R10",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Conservation 5 ans",
+      "source": "bct_circulaire_2017_08",
+      "is_bct_binding": true,
+      "article_ref": "Art.45",
+      "fatf_rec": "R11",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Travel Rule SWIFT",
+      "source": "fatf_recommendations_2024",
+      "is_bct_binding": false,
+      "article_ref": "R.16",
+      "fatf_rec": "R16",
+      "status": "CONFORME"
+    }
+  ],
+  "applicable_rules_count": 5,
+  "coverage_fatf": 94.69999999999999,
+  "coverage_bct": 84.1,
+  "ml_top_features": [
+    {
+      "feature": "reconstruction_error",
+      "value": 6.2,
+      "shap": 13.4,
+      "pushes": "FRAUDE",
+      "interpretation": "Séquence temporelle anormale détectée par l'autoencoder LSTM"
+    },
+    {
+      "feature": "currency_mismatch",
+      "value": 1,
+      "shap": 8.1,
+      "pushes": "FRAUDE",
+      "interpretation": "Conversion de devise (layering possible)"
+    },
+    {
+      "feature": "is_night",
+      "value": 1,
+      "shap": 3.2,
+      "pushes": "FRAUDE",
+      "interpretation": "Transaction effectuée la nuit"
+    },
+    {
+      "feature": "sender_fanout_ratio",
+      "value": 0.85,
+      "shap": 2.1,
+      "pushes": "FRAUDE",
+      "interpretation": "Émetteur diversifie vers de nombreux récepteurs (pattern smurfing)"
+    },
+    {
+      "feature": "amount_vs_sender_mean",
+      "value": 4.5,
+      "shap": 1.7,
+      "pushes": "FRAUDE",
+      "interpretation": "Montant anormal par rapport à l'historique de l'émetteur"
+    }
+  ],
+  "ml_decision": "FRAUDE_SUSPECTÉE",
+  "required_documents": [
+    "Justification économique impérative (refus si absent)",
+    "Documentation du donneur d'ordre et du bénéficiaire effectif",
+    "Formulaire goAML pour transmission CTAF dans les 48h"
+  ],
+  "narrative": "La transaction SWIFT d'un montant de 21,800 USD de Eric Badege (Congo) vers Iran National Bank (Iran) a été évaluée par le système AML/KYC.\n\n**Décision système** : BLOCK (score combiné 100.0/100, niveau CRITIQUE).\n\n**Profil client** : niveau de risque structurel FAIBLE (score 10/100). PEP : non. KYC : complet. STR antérieurs : non.\n\n**3 obligation(s) violée(s)** :\n  • [⚖️BCT] bct_circulaire_2017_08_aml.pdf Article 43 (réf. FATF R6) : Transactions avec pays sous sanctions ONU interdites — gel automatique des fonds requis\n  • [FATF] fatf_recommendations_2024.pdf Recommendation 19 (réf. FATF R19) : Iran figure sur la liste FATF des juridictions à haut risque (countermeasures)\n  • [⚖️BCT] bct_circulaire_2006_19.pdf Article 12 (réf. FATF R20) : Obligation de déclaration de soupçon à la CTAF dans les 48h pour toute transaction suspecte\n\n**Analyse ML** : probabilité de fraude 97.0/100 (FRAUDE_SUSPECTÉE).\nFacteurs ML dominants :\n  • reconstruction_error (FRAUDE) : Séquence temporelle anormale détectée par l'autoencoder LSTM\n  • currency_mismatch (FRAUDE) : Conversion de devise (layering possible)\n  • is_night (FRAUDE) : Transaction effectuée la nuit\n\n**Recommandation** : REFUSER — Sanctions ou interdictions BCT/ONU violées",
+  "audit_trail": [
+    {
+      "step": "compliance_agent",
+      "decision": "BLOCK",
+      "score": 100.0,
+      "violations": 3
+    },
+    {
+      "step": "ml_fraud_detector",
+      "score": 97.0,
+      "decision": "FRAUDE_SUSPECTÉE"
+    },
+    {
+      "step": "client_scoring",
+      "level": "FAIBLE",
+      "factors": []
+    },
+    {
+      "step": "fusion",
+      "formula": "max(ca, 0.6*ca + 0.4*ml)",
+      "combined": 100.0
+    }
+  ]
+}

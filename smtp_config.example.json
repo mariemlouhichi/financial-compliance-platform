@@ -1,0 +1,8 @@
+{
+  "_comment": "Copier en smtp_config.json (gitignoré). Pour Gmail, utiliser un MOT DE PASSE D'APPLICATION (myaccount.google.com/apppasswords), pas le mot de passe du compte. Les espaces du mot de passe sont retirés automatiquement. Sans ce fichier, l'application fonctionne en mode démo : les codes s'affichent dans la console.",
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": 587,
+  "smtp_user": "votre.adresse@gmail.com",
+  "smtp_password": "REMPLACER_PAR_MOT_DE_PASSE_APPLICATION",
+  "smtp_from": "votre.adresse@gmail.com"
+}

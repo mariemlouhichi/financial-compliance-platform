@@ -1,0 +1,70 @@
+{
+  "dataset": "HI-Small_Trans.csv",
+  "computed_at": "2026-07-07T20:33:45",
+  "total_transactions": 5078345,
+  "fraud_count": 5177,
+  "fraud_rate_pct": 0.1019,
+  "total_amount_usd_billion": 22899.65,
+  "by_payment_format": {
+    "Cheque": 1864331,
+    "Credit Card": 1323324,
+    "ACH": 600797,
+    "Cash": 490891,
+    "Reinvestment": 481056,
+    "Wire": 171855,
+    "Bitcoin": 146091
+  },
+  "fraud_by_payment_format": {
+    "ACH": 4483,
+    "Cheque": 324,
+    "Credit Card": 206,
+    "Cash": 108,
+    "Bitcoin": 56
+  },
+  "by_currency": {
+    "US Dollar": 1895172,
+    "Euro": 1168297,
+    "Swiss Franc": 234860,
+    "Yuan": 213752,
+    "Shekel": 192184,
+    "Rupee": 190202,
+    "UK Pound": 180738,
+    "Yen": 155209,
+    "Ruble": 155178,
+    "Bitcoin": 146066
+  },
+  "by_amount_bucket": {
+    "< 100": 934406,
+    "100 – 1k": 1377027,
+    "1k – 10k": 1396292,
+    "10k – 100k": 793993,
+    "100k – 1M": 376224,
+    "> 1M": 200403
+  },
+  "fraud_by_hour": {
+    "00h": 176,
+    "01h": 152,
+    "02h": 165,
+    "03h": 146,
+    "04h": 154,
+    "05h": 188,
+    "06h": 207,
+    "07h": 195,
+    "08h": 258,
+    "09h": 217,
+    "10h": 234,
+    "11h": 295,
+    "12h": 336,
+    "13h": 292,
+    "14h": 279,
+    "15h": 263,
+    "16h": 311,
+    "17h": 257,
+    "18h": 255,
+    "19h": 231,
+    "20h": 134,
+    "21h": 154,
+    "22h": 128,
+    "23h": 150
+  }
+}

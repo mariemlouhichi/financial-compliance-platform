@@ -1,0 +1,303 @@
+Extraction : 2026-05-14T13:25:10.794353
+Modèle     : llama-3.3-70b-versatile
+============================================================
+
+[01] groq_llm | bct_circulaire_2017_08_aml.pdf | Article 4-a
+  S: The subject establishments
+  C: 
+  O: take appropriate measures to identify, assess, and understand the risks of money
+  X: 
+
+[02] groq_llm | bct_circulaire_2017_08_aml.pdf | Article 14
+  S: Establishments subject to this requirement
+  C: When concluding contracts with foreign banking correspondents and similar relati
+  O: Must ensure correspondent is authorized, obtain sufficient information, evaluate
+  X: 
+
+[03] groq_llm | bct_circulaire_2017_08_aml.pdf | Article 3
+  S: Banks and financial institutions
+  C: 
+  O: Must describe the required diligences and rules, particularly in matters of clie
+  X: More frequent for clients subject to enhanced vigilance, results must be documen
+
+[04] groq_llm | bct_circulaire_2025_17_aml_refonte.pdf.pdf | Article 4-a
+  S: Establishments subject to this provision
+  C: 
+  O: Must define and implement a system for identifying and assessing risks of money 
+  X: Risk assessments must be documented in a report and updated regularly
+
+[05] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 18-f
+  S: Credit or financial institutions
+  C: When offering products with limited functionality
+  O: Must ensure transactions are carried out through an account in the customer’s na
+  X: 
+
+[06] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 26
+  S: Firms
+  C: When relying on a third party based in a high-risk third country
+  O: Must not rely on that third party, unless the intermediary is a branch or majori
+  X: To the extent permitted by national legislation
+
+[07] groq_llm | bct_circulaire_2024_02_aml.pdf | Préambule
+  S: Banks and financial institutions
+  C: 
+  O: Must comply with the requirements set out in the circular before and during the 
+  X: 
+
+[08] groq_llm | fatf_mvts_guidance_2016.pdf | Numbered 54
+  S: MVTS providers
+  C: For cross-border and domestic wire transfers, with a possible de minimis thresho
+  O: Must include relevant originator and beneficiary information on wire transfers a
+  X: Unless there is an ML/TF suspicion, in which case customer information should be
+
+[09] groq_llm | 2024_Reglementation_Bancaire.pdf | Article 11
+  S: Subject institutions belonging to a financial conglomerate
+  C: When they hold a majority stake in branches and subsidiaries
+  O: Must implement anti-money laundering and counter-terrorist financing programs, i
+  X: Throughout the business relationship, with regular monitoring
+
+[10] groq_llm | 2024_Reglementation_Bancaire.pdf | Article 20
+  S: Subject institutions
+  C: When using new technologies for money laundering or terrorist financing purposes
+  O: Must implement a framework to prevent risks, equip themselves with risk manageme
+  X: Before the launch of new products or services or before the use of new or develo
+
+[11] groq_llm | bct_circulaire_2018_09_aml_update.pdf | Article 57
+  S: The compliance body
+  C: 
+  O: Must centralize and examine reports, examine unusual transactions, ensure enhanc
+  X: Within a reasonable timeframe
+
+[12] groq_llm | bct_circulaire_2024_02_aml.pdf | Numbered 7-b
+  S: Financial institutions
+  C: 
+  O: Must include specific internal control rules for financial products and services
+  X: Procedures shall be reviewed annually and updated as necessary
+
+[13] groq_llm | bct_circulaire_2017_08_aml.pdf | Article 6
+  S: Institutions subject to this provision
+  C: When the client wishes to open an account, conducts occasional transactions in c
+  O: Must carry out due diligence regarding the client's identity and, if applicable,
+  X: 
+
+[14] groq_llm | loi_2015_26_aml_cft.pdf | Article 110
+  S: Persons subject to Article 107 of this law, including private exchange offices, 
+  C: When dealing with foreign subsidiaries, companies they own the majority of the c
+  O: Must apply due diligence measures, have adequate risk management systems in plac
+  X: When the regulations of the countries in which they are established do not allow
+
+[15] groq_llm | amld5_directive_2018_843.pdf | Paragraph 1-b
+  S: Member States
+  C: When dealing with third countries at high risk
+  O: Must ensure that the derogation provided is applied and that competent authoriti
+  X: 
+
+[16] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 13
+  S: Firms
+  C: When the business relationship is initiated, established, or conducted in non-fa
+  O: Must take adequate measures to be satisfied that the customer is who he claims t
+  X: 
+
+[17] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 19
+  S: Correspondent institutions
+  C: When the correspondent relationship involves the execution of payments with a th
+  O: Must apply specific Enhanced Due Diligence (EDD) measures in addition to Custome
+  X: Measures can be adjusted on a risk-sensitive basis
+
+[18] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 12-b
+  S: Money remittance service providers
+  C: When providing services through agents with unusual turnover patterns, high-risk
+  O: Must apply group-wide AML/CFT policies and monitor transactions for suspicious a
+  X: 
+
+[19] groq_llm | fatf_recommendations_2025.pdf | Numbered 18
+  S: Financial institutions
+  C: When assessing the money laundering and terrorist financing risks relating to ty
+  O: Must take into account risk variables relating to those risk categories
+  X: 
+
+[20] groq_llm | fatf_recommendations_2025.pdf | Numbered 21
+  S: Financial institutions
+  C: Where the risks of money laundering or terrorist financing are lower
+  O: Must implement simplified CDD measures proportionate to the lower risk factors
+  X: Except when there is a suspicion of money laundering or terrorist financing, or 
+
+[21] groq_llm | fatf_recommendations_2025.pdf | Numbered 1
+  S: Financial institutions
+  C: When suspicious or unusual activity is detected
+  O: Must report suspicious transactions, implement freezing action, and comply with 
+  X: As per the obligations set out in the relevant United Nations Security Council r
+
+[22] groq_llm | bct_circulaire_2017_08_aml.pdf | Article 9
+  S: Subject establishments
+  C: When engaging third parties to fulfill their client knowledge obligations
+  O: Must obtain necessary information about the third party's vigilance measures, en
+  X: Within the shortest possible deadlines
+
+[23] groq_llm | fatf_recommendations_2025.pdf | Numbered 3-a
+  S: All persons making a physical cross-border transportation of currency or bearer 
+  C: When the value of currency or bearer negotiable instruments exceeds USD/EUR 15,0
+  O: Must submit a truthful declaration to the designated competent authorities
+  X: 
+
+[24] groq_llm | basel_core_principles_d494.pdf | Article 85-e
+  S: Banks in Indonesia
+  C: 
+  O: Must investigate possible connected counterparties on the basis of economic inte
+  X: 
+
+[25] groq_llm | fatf_recommendations_2025.pdf | Numbered 1
+  S: Casinos, dealers in precious metals and dealers in precious stones
+  C: When transaction exceeds designated thresholds (USD/EUR 3,000 for casinos, USD/E
+  O: Must report financial transactions above the designated threshold
+  X: 
+
+[26] groq_llm | fatf_recommendations_2025.pdf | Numbered 2
+  S: Reporting entities
+  C: When filing disclosures, including suspicious transaction reports and threshold-
+  O: Must file disclosures, including suspicious transaction reports, cash transactio
+  X: 
+
+[27] groq_llm | fatf_mvts_guidance_2016.pdf | Numbered 48-g
+  S: Financial institutions
+  C: When transaction exceeds the threshold (EUR 5,000, EUR 2,500, EUR 1,000)
+  O: Must report transactions above the threshold
+  X: Transactions below the threshold are not reported, specific dates for threshold 
+
+[28] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 12-a
+  S: Firms
+  C: When the monetary threshold for transactions is reached
+  O: Must set the threshold at a level that presents a low risk for both terrorist fi
+  X: Over the course of 12 months
+
+[29] groq_llm | fatf_mvts_guidance_2016.pdf | Numbered 27
+  S: Competent authorities of the host jurisdiction and home authority of MVTS provid
+  C: When MVTS providers operate without physical presence in the host country
+  O: Must liaise to address ML/TF concerns and require submission of STRs or other re
+  X: As appropriate, without prejudice to the right of the host country
+
+[30] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 13-f
+  S: Firms
+  C: When the threshold or time limit has been reached
+  O: Must have systems in place to detect when the threshold or time limit has been r
+  X: At the outset, where applicable legislation requires
+
+[31] groq_llm | loi_2015_26_aml_cft.pdf | Article 116
+  S: Reporting entities and persons subject to vigilance measures
+  C: 
+  O: Must collect and analyze declarations, assist in program elaboration, participat
+  X: 
+
+[32] groq_llm | eba_gl_2021_02_risk_factors.pdf | Article 2-k
+  S: CSPs
+  C: When dealing with customers from high-risk jurisdictions or with links to jurisd
+  O: Must take into account country or geographical risk factors and pay particular a
+  X: 
+
+[33] groq_llm | fatf_recommendations_2025.pdf | Préambule-c
+  S: Financial institutions
+  C: 
+  O: Must apply a risk-based approach and implement targeted financial sanctions
+  X: 
+
+[34] groq_llm | fatf_recommendations_2025.pdf | Numbered 1-b
+  S: Countries
+  C: 
+  O: Must identify, assess, and understand the money laundering and terrorist financi
+  X: 
+
+[35] groq_llm | fatf_recommendations_2025.pdf | Numbered 14
+  S: Natural or legal persons that provide money or value transfer services (MVTS)
+  C: 
+  O: Must be licensed or registered, and subject to effective systems for monitoring 
+  X: 
+
+[36] groq_llm | loi_2015_26_aml_cft.pdf | Article 91
+  S: Heads of legal entities, their representatives, agents, associates, and commissi
+  C: When personal responsibility is established
+  O: Are subject to a fine equal to five times the amount of the fine provided for ph
+  X: Fine may be increased to an amount equal to the value of the seized assets, and 
+
+[37] groq_llm | fatf_correspondent_banking.pdf | Numbered 87-w
+  S: Financial institutions
+  C: 
+  O: Must comply with AML/CFT requirements and follow guidance on detecting and repor
+  X: 
+
+[38] groq_llm | fatf_recommendations_2025.pdf | Numbered 23
+  S: Designated non-financial businesses and professions (e.g. lawyers, notaries, acc
+  C: When engaging in specific financial transactions or activities (e.g. on behalf o
+  O: Must report suspicious transactions
+  X: 
+
+[39] groq_llm | basel_aml_sound_management_d353.pdf | Numbered 57
+  S: Banks
+  C: When statutory obligations under recognised suspicious activity reporting regime
+  O: Must report the transaction and ensure confidentiality, swift investigation, and
+  X: Prompt disclosures if suspected crime proceeds remain in an account
+
+[40] groq_llm | fatf_recommendations_2025.pdf | Numbered 4
+  S: Group-level compliance, audit, and/or AML/CFT functions, branches and subsidiari
+  C: When necessary for AML/CFT purposes
+  O: Must provide and receive customer, account, and transaction information, includi
+  X: 
+
+[41] groq_llm | fatf_virtual_assets_red_flags.pdf | Numbered 5
+  S: Reporting entities
+  C: When a customer has an inconsistent explanation or when there is no logical busi
+  O: Must file an STR or seek clarification on the transaction
+  X: null
+
+[42] groq_llm | fatf_virtual_assets_red_flags.pdf | Numbered 11-a
+  S: Reporting entities
+  C: When structuring VA transactions in small amounts or making multiple high-value 
+  O: Must report suspicious transactions
+  X: Within a 24-hour period or in a staggered and regular pattern
+
+[43] groq_llm | fatf_virtual_assets_red_flags.pdf | Préambule-b
+  S: Virtual Asset Service Providers (VASPs) and other reporting entities
+  C: 
+  O: Must identify and report suspicious transactions and red flag indicators related
+  X: 
+
+[44] groq_llm | fatf_virtual_assets_red_flags.pdf | Numbered 8
+  S: Reporting entities
+  C: 
+  O: Must monitor and examine further when a red flag indicator is present
+  X: 
+
+[45] groq_llm | fatf_virtual_assets_red_flags.pdf | Préambule-a
+  S: 
+  C: 
+  O: 
+  X: 
+
+[46] groq_llm | ctaf_rapport_activite_2023.pdf | Numbered 1-f
+  S: Reporting entities
+  C: When suspicious transactions or activities are detected
+  O: Must file a suspicious transaction report (STR) with the relevant authority
+  X: 
+
+[47] groq_llm | fatf_recommendations_2025.pdf | Numbered 15
+  S: Countries and financial institutions
+  C: When developing or using new products, business practices, or technologies
+  O: Must identify and assess money laundering or terrorist financing risks and take 
+  X: Prior to the launch of the new products, business practices or the use of new or
+
+[48] groq_llm | fatf_recommendations_2025.pdf | Numbered 12
+  S: Financial institutions and DNFBPs
+  C: 
+  O: Must identify and assess money laundering and terrorist financing risks, documen
+  X: Risk assessments must be kept up to date and be appropriate and proportionate to
+
+[49] groq_llm | fatf_mvts_guidance_2016.pdf | Numbered 84-a
+  S: Money or Value Transfer Services
+  C: 
+  O: Provide guidelines and assistance to assess compliance program regime, develop r
+  X: Through periodic AML compliance program reviews
+
+[50] groq_llm | basel_aml_sound_management_d353.pdf | Numbered 46
+  S: Banks
+  C: When establishing scenarios for identifying unusual or suspicious transactions o
+  O: Must have systems in place to detect unusual or suspicious transactions or patte
+  X: 

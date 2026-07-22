@@ -1,0 +1,1148 @@
+{
+  "metadata": {
+    "version": "2.1",
+    "generated": "2026-05-14T13:25:10.790125",
+    "total_rules": 50,
+    "target": 50,
+    "llm_model": "llama-3.3-70b-versatile",
+    "methodology": {
+      "filtering": "ObliQA (Gokhan et al., 2024)",
+      "structuring": "Compliance-to-Code (Chen et al., 2025)",
+      "components": [
+        "subject",
+        "condition",
+        "constraint",
+        "context"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "01",
+      "source_doc": "bct_circulaire_2017_08_aml.pdf",
+      "source_article": "Article 4-a",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2017__Article_4_a_02685",
+      "source_text": "Article 4:\nThe subject establishments shall take appropriate measures to identify, assess, and understand the risks of money laundering and terrorist financing to which they are exposed, taking into account risk factors such as the client profile, countries or geographical areas, products, services, transactions, or distribution channels. The subject establishments shall:\n- document their risk assessments;\n- consider all relevant risk factors before determining the overall risk level and the level and type of appropriate measures to apply to mitigate those risks.\n\n\"Operation or transaction unu",
+      "components": {
+        "subject": "The subject establishments",
+        "condition": null,
+        "constraint": "take appropriate measures to identify, assess, and understand the risks of money laundering and terrorist financing, document their risk assessments, and consider all relevant risk factors",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 21
+      }
+    },
+    {
+      "id": "02",
+      "source_doc": "bct_circulaire_2017_08_aml.pdf",
+      "source_article": "Article 14",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2017__Article_14_02695",
+      "source_text": "Article 14:\nEstablishments subject to this requirement must, when concluding contracts with foreign banking correspondents and similar relationships, particularly those established for conducting securities transactions or electronic fund transfers, whether for their own account abroad or for their client's account:\n- ensure that the correspondent is duly authorized and subject to the supervision of the competent authorities of their country of origin or the country where they are established;\n- obtain sufficient information from the counterparty establishment regarding the nature of its activ",
+      "components": {
+        "subject": "Establishments subject to this requirement",
+        "condition": "When concluding contracts with foreign banking correspondents and similar relationships",
+        "constraint": "Must ensure correspondent is authorized, obtain sufficient information, evaluate anti-money laundering measures, ensure decision is made by authorized person, and have assurance on 'pass-through' accounts",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 21
+      }
+    },
+    {
+      "id": "03",
+      "source_doc": "bct_circulaire_2017_08_aml.pdf",
+      "source_article": "Article 3",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2017__Article_3_02731",
+      "source_text": "article 3 of circular no. 2006-19 and must describe the required diligences and rules, particularly in matters of:\n- client identification and knowledge;\n- establishment and updating of client files;\n- determination of verification identity of clients and updating related information; these deadlines must be more frequent for clients subject to enhanced vigilance;\n- execution of electronic funds transfer operations;\n- establishment of relationships with foreign correspondent banks;\n- surveillance and examination of unusual operations and transactions; the results must be documented in writing",
+      "components": {
+        "subject": "Banks and financial institutions",
+        "condition": null,
+        "constraint": "Must describe the required diligences and rules, particularly in matters of client identification and knowledge, establishment and updating of client files, determination of verification identity of clients, execution of electronic funds transfer operations, establishment of relationships with foreign correspondent banks, surveillance and examination of unusual operations and transactions, and analysis of operations or transactions subject to a declaration of suspicion",
+        "context": "More frequent for clients subject to enhanced vigilance, results must be documented in writing and made available to the Central Bank of Tunisia"
+      },
+      "amounts": [
+        {
+          "value": 19.0,
+          "unit": "YEARS",
+          "raw": "19 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 21
+      }
+    },
+    {
+      "id": "04",
+      "source_doc": "bct_circulaire_2025_17_aml_refonte.pdf.pdf",
+      "source_article": "Article 4-a",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2025__Article_4_a_02843",
+      "source_text": "Article 4 (new): Establishments subject to this provision must define and implement a system for identifying and assessing risks of money laundering, terrorist financing, and weapons of mass destruction financing to which they are exposed, as well as a risk mitigation policy. In the context of identifying and assessing these risks, establishments subject to this provision take into account, among other factors:\n\na) risk factors related to the characteristics of their clientele, the products and services provided or considered, the technologies used for their distribution, and the risks associa",
+      "components": {
+        "subject": "Establishments subject to this provision",
+        "condition": null,
+        "constraint": "Must define and implement a system for identifying and assessing risks of money laundering, terrorist financing, and weapons of mass destruction financing and a risk mitigation policy",
+        "context": "Risk assessments must be documented in a report and updated regularly"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 20
+      }
+    },
+    {
+      "id": "05",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 18-f",
+      "jurisdiction": "EU",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_18_g_03612",
+      "source_text": "9.5.\n\nThe following factors  may  contribute  to reducing risk:   56 \n \n The product has limited functionality, for example  in the case  of: \n a fixed term  savings  product with low  savings  thresholds;  \n a product  where  the benefits cannot be realised  for the benefit of  a third party;  \n a product  where  the benefits  are only  realisable  in the long term  or for a specific  \npurpose, such  as retirement  or a property purchase;  \n a low-value  loan  facility,  including one that is conditional  on the purchase  of a \nspecific consumer good  or service; or  \n a low-value  product,",
+      "components": {
+        "subject": "Credit or financial institutions",
+        "condition": "When offering products with limited functionality",
+        "constraint": "Must ensure transactions are carried out through an account in the customer’s name at a credit or financial institution subject to AML/CFT requirements",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 18
+      }
+    },
+    {
+      "id": "06",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 26",
+      "jurisdiction": "EU",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_26_03493",
+      "source_text": "Article 26 of Directive (EU) 2015/849 , and whether there a re any indications that \nthe third party’s level of compliance with applicable AML /CFT  legislation o r \nregulation is inadequate, for example whether  the third party has been sanctioned \nfor breaches of AML/CFT obligations ;  23 \n \n whether they are based in a jurisdiction as sociated with higher ML/TF risk.  Where \na third party is based in a high -risk third country that the C EU Commission has \nidentified as having strategic deficiencies, firms must not rely on that third party. \nHowever, to the extent permitted by national legi",
+      "components": {
+        "subject": "Firms",
+        "condition": "When relying on a third party based in a high-risk third country",
+        "constraint": "Must not rely on that third party, unless the intermediary is a branch or majority-owned subsidiary of another firm established in the Union and the firm is confident that the intermediary fully complies with group-wide policies and procedures",
+        "context": "To the extent permitted by national legislation"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "07",
+      "source_doc": "bct_circulaire_2024_02_aml.pdf",
+      "source_article": "Préambule",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2024__Pr_ambule_02803",
+      "source_text": "Tunis, January 29, 2024\n\nCIRCULAR TO BANKS AND FINANCIAL INSTITUTIONS No. 2024-2\nSubject: Conditions of sale and pricing of financial products and services.\n\nThe Governor of the Central Bank of Tunisia,\nPursuant to Organic Law No. 2004-63 of July 27, 2004, on the protection of personal data,\nOrganic Law No. 2015-26 of August 7, 2015, on the fight against terrorism and the repression of money laundering, as amended and completed by Organic Law No. 2019-09 of January 23, 2019,\nLaw No. 2000-83 of August 9, 2000, on exchanges and electronic commerce,\nLaw No. 2005-51 of June 27, 2005, on electronic",
+      "components": {
+        "subject": "Banks and financial institutions",
+        "condition": null,
+        "constraint": "Must comply with the requirements set out in the circular before and during the marketing of any product or service",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "08",
+      "source_doc": "fatf_mvts_guidance_2016.pdf",
+      "source_article": "Numbered 54",
+      "jurisdiction": "International",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_fatf_mvts_guidance_2_Numbered_54_05083",
+      "source_text": "54. Recommendation 16 establishes the requirements for countries with respect to wire \ntransfers. Recommendation 16 applies to cross -border wire transfers and domestic wire transf ers.\n38 \nMVTS providers must include relevant originator and beneficiary information on wire transfers and ensure that the information remains with the wire transfer throughout the payment chain as set out in the Interpretive Note to Recommendation 16. It is important to note, that countries may adopt a de minimis  threshold for cross -border wire transfers, below which verification of the customer, and \nbeneficiary",
+      "components": {
+        "subject": "MVTS providers",
+        "condition": "For cross-border and domestic wire transfers, with a possible de minimis threshold for cross-border wire transfers below USD/EUR 1,000",
+        "constraint": "Must include relevant originator and beneficiary information on wire transfers and ensure that the information remains with the wire transfer throughout the payment chain",
+        "context": "Unless there is an ML/TF suspicion, in which case customer information should be verified"
+      },
+      "amounts": [
+        {
+          "value": 1000.0,
+          "unit": "USD/EUR",
+          "raw": "USD/EUR 1 000"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "09",
+      "source_doc": "2024_Reglementation_Bancaire.pdf",
+      "source_article": "Article 11",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_2024_Reglementation__Article_11_01865",
+      "source_text": "Article 11:\nSubject institutions belonging to a financial conglomerate must implement anti-money laundering and counter-terrorist financing programs adapted to all their branches and subsidiaries in which they hold a majority stake. These programs include:\n(a) policies and procedures for sharing information required for customer due diligence and for managing money laundering and terrorist financing risk;\n(b) the provision of information from branches and subsidiaries relating to clients, accounts, and transactions, when necessary for the purposes of combating laundering. to English:\n\n**734**",
+      "components": {
+        "subject": "Subject institutions belonging to a financial conglomerate",
+        "condition": "When they hold a majority stake in branches and subsidiaries",
+        "constraint": "Must implement anti-money laundering and counter-terrorist financing programs, including policies and procedures for sharing information and managing risk",
+        "context": "Throughout the business relationship, with regular monitoring"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "10",
+      "source_doc": "2024_Reglementation_Bancaire.pdf",
+      "source_article": "Article 20",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_2024_Reglementation__Article_20_01874",
+      "source_text": "Article 20:\n\nSubject institutions must implement a framework to prevent the risks inherent in the use of new technologies for money laundering or terrorist financing purposes. To this end, they must equip themselves with risk management systems to identify and assess the risks of money laundering or terrorist financing that may result:\n- from the development of new products and services, including new distribution channels; and\n- from the use of new or developing technologies in connection with new or pre-existing products.\n\nThe risk assessment referred to in the first paragraph of this articl",
+      "components": {
+        "subject": "Subject institutions",
+        "condition": "When using new technologies for money laundering or terrorist financing purposes, or when launching new products or services, or using new or developing technologies",
+        "constraint": "Must implement a framework to prevent risks, equip themselves with risk management systems, identify and assess risks, take measures to manage and mitigate risks, examine context of operations requiring enhanced vigilance, and record results in writing",
+        "context": "Before the launch of new products or services or before the use of new or developing technologies"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "11",
+      "source_doc": "bct_circulaire_2018_09_aml_update.pdf",
+      "source_article": "Article 57",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2018__Article_57_02794",
+      "source_text": "Article 57-bis:\n\nThe compliance body shall be equipped with qualified and sufficient resources enabling it to:\n- centralize and examine reports from agencies on unusual or complex operations;\n- examine, within a reasonable timeframe, transactions deemed unusual or complex detected by the surveillance system;\n- ensure enhanced monitoring of accounts recording unusual or suspicious transactions and business relationships. 15.\n - keeping the governing body informed about clients with high risk profiles; and\n- ensuring permanent compliance with rules regarding the obligation to monitor. \n\nThe comp",
+      "components": {
+        "subject": "The compliance body",
+        "condition": null,
+        "constraint": "Must centralize and examine reports, examine unusual transactions, ensure enhanced monitoring, keep the governing body informed, and ensure permanent compliance",
+        "context": "Within a reasonable timeframe"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "12",
+      "source_doc": "bct_circulaire_2024_02_aml.pdf",
+      "source_article": "Numbered 7-b",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "OBLIGATION",
+      "chunk_id": "CHK_bct_circulaire_2024__Numbered_7_b_03056_s03",
+      "source_text": "These procedures shall be reviewed annually and updated as necessary. Article 6: Notwithstanding the provisions of Article 4 of the present circular, the sales and pricing policy for financial products and services must include specific internal control rules for financial products and services marketed through information technology and communication channels, ensuring:\n- risk management, particularly the risk of cybersecurity, money laundering and terrorism financing, and reputation;\n- security of platforms and transactions; and\n- continuity of the provision of financial products or services",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": null,
+        "constraint": "Must include specific internal control rules for financial products and services marketed through information technology and communication channels, ensuring risk management, security of platforms and transactions, and continuity of provision",
+        "context": "Procedures shall be reviewed annually and updated as necessary"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "13",
+      "source_doc": "bct_circulaire_2017_08_aml.pdf",
+      "source_article": "Article 6",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_bct_circulaire_2017__Article_6_02688",
+      "source_text": "Article 6:\n\nInstitutions subject to this provision must carry out due diligence regarding the client's identity and, if applicable, the beneficiary of the transaction or operation and the capacity of the person acting on their behalf, particularly when:\n- the client wishes to open an account, regardless of its nature, or rent a safe deposit box;\n- the client conducts occasional transactions in cash, with a value equal to or exceeding 10,000 dinars or the equivalent of 5,000 dinars in foreign banknotes, in accordance with Circular No. 2012-11;\n- the client conducts transactions in the form of e",
+      "components": {
+        "subject": "Institutions subject to this provision",
+        "condition": "When the client wishes to open an account, conducts occasional transactions in cash, conducts transactions in the form of electronic fund transfers, there is suspicion of money laundering or terrorism financing, or there are doubts about the authenticity or relevance of the client's previously obtained identification data",
+        "constraint": "Must carry out due diligence regarding the client's identity and, if applicable, the beneficiary of the transaction or operation and the capacity of the person acting on their behalf",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 10.0,
+          "unit": "TND",
+          "raw": "10,000 dinars"
+        },
+        {
+          "value": 5.0,
+          "unit": "TND",
+          "raw": "5,000 dinars"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 20
+      }
+    },
+    {
+      "id": "14",
+      "source_doc": "loi_2015_26_aml_cft.pdf",
+      "source_article": "Article 110",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_loi_2015_26_aml_cft_Article_107_03063",
+      "source_text": "Art. 110 - Persons subject to\n\nArticle 107 of this law shall take the necessary due diligence measures, including:\n\n- ensuring that their foreign subsidiaries and companies they own the majority of the capital stock apply the measures for the suppression of money laundering and the fight against terrorism financing, and informing the controlling authorities when the regulations of the countries in which they are established do not allow the application of these measures,\n- having adequate risk management systems in place for relationships with persons holding or having held high public functio",
+      "components": {
+        "subject": "Persons subject to Article 107 of this law, including private exchange offices, approved intermediaries, and sub-delegated change agents",
+        "condition": "When dealing with foreign subsidiaries, companies they own the majority of the capital stock, persons holding or having held high public functions or missions, or transactions in foreign currencies worth a fixed amount",
+        "constraint": "Must apply due diligence measures, have adequate risk management systems in place, declare converted amounts, ensure identity of persons conducting transactions, and inform the controlling authorities or Tunisian Central Bank",
+        "context": "When the regulations of the countries in which they are established do not allow the application of these measures"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "15",
+      "source_doc": "amld5_directive_2018_843.pdf",
+      "source_article": "Paragraph 1-b",
+      "jurisdiction": "EU",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_amld5_directive_2018_Paragraph_2_03095",
+      "source_text": "5) Article 9 is amended as follows:\na)\n\nParagraph 2 is replaced by the following text:\n\"2. The Commission is authorized to adopt delegated acts in accordance with Article 64 to identify third countries at high risk, taking into account their strategic deficiencies, particularly in the following areas:\na) The legal and institutional framework of the third country in the fight against money laundering and terrorist financing, specifically:\ni) Criminalization of money laundering and terrorist financing;\nii) Measures regarding customer due diligence;\niii) Record-keeping and retention requirements;",
+      "components": {
+        "subject": "Member States",
+        "condition": "When dealing with third countries at high risk",
+        "constraint": "Must ensure that the derogation provided is applied and that competent authorities have powers and procedures in place",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "16",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 13",
+      "jurisdiction": "EU",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_13_03521",
+      "source_text": "Article 13(1) of Directive (EU) 2015/849 , where the \nbusiness relationship is initiated, established, or conducted in non -face to face situations or \nan occasi onal trans action is done in non -face to face situations, firms should : \n take adequate measures to be satisfied that the customer is who he claims to \nbe; and   1. Evaluate if the non-face-to-face relationship or infrequent transaction increases ML/TF risk and implement additional CDD measures if necessary. Consider the risk factors outlined in Guideline 2.1 when assessing non-face-to-face relationship risks.\n2. If the risk associa",
+      "components": {
+        "subject": "Firms",
+        "condition": "When the business relationship is initiated, established, or conducted in non-face-to-face situations or an occasional transaction is done in non-face-to-face situations",
+        "constraint": "Must take adequate measures to be satisfied that the customer is who he claims to be, evaluate if the non-face-to-face relationship or infrequent transaction increases ML/TF risk, and implement additional CDD measures if necessary",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "17",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 19",
+      "jurisdiction": "EU",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_19_03587",
+      "source_text": "Article 19 of Directive (EU) 2015/849, where the correspondent relatio nship involves the execution of payments with a third country \nrespondent institution, correspondents should apply specific EDD measures in addition to \nthe CDD measures set out in Article 13 of Directive (EU) 2015/849 but can adjust those \nmeasures on a risk  sensitive basis. In all other situations, firms should apply at least guideline \n8.10 to 8.13.   \n8.15. Correspondents must apply each of these EDD measures to respondents based in a non -EEA \ncountry, but correspondents can adjust the extent of these measures on a ri",
+      "components": {
+        "subject": "Correspondent institutions",
+        "condition": "When the correspondent relationship involves the execution of payments with a third country respondent institution",
+        "constraint": "Must apply specific Enhanced Due Diligence (EDD) measures in addition to Customer Due Diligence (CDD) measures",
+        "context": "Measures can be adjusted on a risk-sensitive basis"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "18",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 12-b",
+      "jurisdiction": "EU",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_12_b_03665",
+      "source_text": "The money  remittance  service  is provided through agents  that:  \n represent more  than  one principal;  \n have  unusual  turnover  patterns  compared  with other agents  in similar  \nlocations,  for example  unusually  high or low transaction  sizes,  \nunusually  large  cash transactions  or a high  number  of transactions  \nthat fall just under  the CDD threshold,  or undertake  business outside  \nnormal business hours; We take on a significant portion of business with payers or payees from high-risk Money Laundering/Terrorist Financing (ML/TF) jurisdictions; exhibit uncertainty or inconsi",
+      "components": {
+        "subject": "Money remittance service providers",
+        "condition": "When providing services through agents with unusual turnover patterns, high-risk jurisdictions, or complex payment structures",
+        "constraint": "Must apply group-wide AML/CFT policies and monitor transactions for suspicious activity",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "19",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 18",
+      "jurisdiction": "International",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_18_04283",
+      "source_text": "18. Having a lower money laundering and terrorist financing risk for identification and verification purposes does not automatically mean that the same customer is lower risk for all types of CDD measures, in particular for ongoing monitoring of transactio ns.  \nRisk variables 19. When assessing the money laundering and terrorist financing risks relating to types of customers, countries or geographic areas, and particular products, services, transactions or delivery channels risk, a financial institution should take into account  risk variables relating to \nthose risk categories. These variabl",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": "When assessing the money laundering and terrorist financing risks relating to types of customers, countries or geographic areas, and particular products, services, transactions or delivery channels",
+        "constraint": "Must take into account risk variables relating to those risk categories",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "20",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 21",
+      "jurisdiction": "International",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_21_04287",
+      "source_text": "21. Where the risks of money laundering or terrorist financing are lower, financial institutions should be allowed and encouraged  to implement  simplified CDD measures, which should take \ninto account the nature of the lower risk. The simplified measures should be proportionate to \nthe lower risk factors (e.g. the simplified measures could relate to customer acceptance measures , aspects of ongoing monitoring, or both). Examples of possible measures are:  \n Verifying the identity of the customer and the beneficial owner after the establishment of the business relationship (e.g. if account tr",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": "Where the risks of money laundering or terrorist financing are lower",
+        "constraint": "Must implement simplified CDD measures proportionate to the lower risk factors",
+        "context": "Except when there is a suspicion of money laundering or terrorist financing, or where specific higher-risk scenarios apply"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "21",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 1",
+      "jurisdiction": "International",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_1_04834_s02",
+      "source_text": "(b) to financial intelligence units for analysing suspicious or unusual activity, and disseminating it as necessary, and  \n(c) to ordering, intermediary and beneficiary financial institutions to facilitate the \nidentification and reporting of suspicious transactions, and to implement the \nrequirements to take freezing action and comply with prohibitions from conducting \ntransacti ons with designated persons and entities, as per the obligations set out in the \nrelevant United Nations Security Council resolutions, such as resolution 1267 (1999) \nand its successor resolutions, and resolution 1373",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": "When suspicious or unusual activity is detected",
+        "constraint": "Must report suspicious transactions, implement freezing action, and comply with prohibitions from conducting transactions with designated persons and entities",
+        "context": "As per the obligations set out in the relevant United Nations Security Council resolutions"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "22",
+      "source_doc": "bct_circulaire_2017_08_aml.pdf",
+      "source_article": "Article 9",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "KYC",
+      "chunk_id": "CHK_bct_circulaire_2017__Article_9_02691",
+      "source_text": "Article 9:\n\nWhen subject establishments engage third parties to fulfill their client knowledge obligations, they must:\n- Obtain necessary information about the third party's vigilance measures regarding clients immediately;\n- Take appropriate measures to ensure that the third party can provide, upon request and within the shortest possible deadlines, copies of identification data and other relevant documents related to client vigilance duties;\n- Ensure that the third party is subject to regulation and supervision regarding money laundering repression and counter-terrorism financing. 9.\nAn esta",
+      "components": {
+        "subject": "Subject establishments",
+        "condition": "When engaging third parties to fulfill their client knowledge obligations",
+        "constraint": "Must obtain necessary information about the third party's vigilance measures, ensure the third party can provide identification data and documents, and ensure the third party is subject to regulation and supervision regarding money laundering repression and counter-terrorism financing",
+        "context": "Within the shortest possible deadlines"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 18
+      }
+    },
+    {
+      "id": "23",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 3-a",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_3_a_04987_s01",
+      "source_text": "3. All persons making a physical cross- border transportation of currency or bearer negotiable \ninstruments (BNIs), which are of a value exceeding a pre- set, maximum threshold of \nUSD/EUR  15,000, are required to submit a truthful declaration to the designated competent \nauthorities. Countries may opt from among the following three different types of declaration system: (i) a written declaration system for all travellers; (ii) a written declaration system for those travellers carrying an amount of currency or BNIs above a threshold; and (iii) an oral declaration system. These three systems ar",
+      "components": {
+        "subject": "All persons making a physical cross-border transportation of currency or bearer negotiable instruments",
+        "condition": "When the value of currency or bearer negotiable instruments exceeds USD/EUR 15,000",
+        "constraint": "Must submit a truthful declaration to the designated competent authorities",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 15.0,
+          "unit": "USD/EUR",
+          "raw": "USD/EUR  15,000"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "24",
+      "source_doc": "basel_core_principles_d494.pdf",
+      "source_article": "Article 85-e",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_basel_core_principle_Article_85_e_03675_s06",
+      "source_text": "The following observations were noted:  \n• intragroup exposures, other than to related Prime Banks and the bank’s pension fund s, are \nincluded in the 10% limit for related -party exposures;  \n• bank holding companies were not included in the scope of application , given that there is \ncurrently no banking group with a holding company structure in Indonesia;  \n• exposures to state -owned ente rprises (SOEs) , which the central government is obligated to fully \nsupport,  for the purpose of national development , are subject to a limit of 30% of the bank’s \ncapital (Tier 1 and Tier 2 capital);",
+      "components": {
+        "subject": "Banks in Indonesia",
+        "condition": null,
+        "constraint": "Must investigate possible connected counterparties on the basis of economic interdependencies",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 10.0,
+          "unit": "PERCENT",
+          "raw": "10%"
+        },
+        {
+          "value": 30.0,
+          "unit": "PERCENT",
+          "raw": "30%"
+        },
+        {
+          "value": 1.0,
+          "unit": "YEARS",
+          "raw": "1 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "25",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 1",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_1_04339",
+      "source_text": "1. The designated thresholds for transactions are as follows:  \n Casinos (under Recommendation 22) - USD/EUR 3,000  \n For dealers in precious metals and dealers in precious stones when engaged \nin any cash transaction (under Recommendations 22 and 23) -  \nUSD/EUR  15,000.   \n Financial transactions above a designated threshold include situations where the transaction is \ncarried out in a single operation or in several operations that appear to be linked.",
+      "components": {
+        "subject": "Casinos, dealers in precious metals and dealers in precious stones",
+        "condition": "When transaction exceeds designated thresholds (USD/EUR 3,000 for casinos, USD/EUR 15,000 for dealers in precious metals and stones)",
+        "constraint": "Must report financial transactions above the designated threshold",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 3.0,
+          "unit": "USD/EUR",
+          "raw": "USD/EUR 3,000"
+        },
+        {
+          "value": 15.0,
+          "unit": "USD/EUR",
+          "raw": "USD/EUR  15,000"
+        },
+        {
+          "value": 22.0,
+          "unit": "YEARS",
+          "raw": "22 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "26",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 2",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_2_04400",
+      "source_text": "2. The FIU serves as the central agency for the receipt of disclosures filed by reporting entities. At a minimum, this information should include suspicious transaction reports, as required by Recommendation 20 and 23, and it should include other informati on as required by national \nlegislation (such as cash transaction reports, wire transfers reports and other threshold -based \ndeclarations/disclosures).  \n(b)  Analysis",
+      "components": {
+        "subject": "Reporting entities",
+        "condition": "When filing disclosures, including suspicious transaction reports and threshold-based declarations/disclosures",
+        "constraint": "Must file disclosures, including suspicious transaction reports, cash transaction reports, wire transfers reports and other threshold-based declarations/disclosures, with the FIU",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 20.0,
+          "unit": "YEARS",
+          "raw": "20 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "27",
+      "source_doc": "fatf_mvts_guidance_2016.pdf",
+      "source_article": "Numbered 48-g",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_fatf_mvts_guidance_2_Numbered_48__05197",
+      "source_text": "None of the requirements set by the Italian AML legislation was fulfilled.\n\nTransfer operations were always made below the threshold – i.e. whereby the threshold for cash \ntransactions was set at EUR 5 000 (up to 12 August 2011), operations then amounted to EUR  4 999 \neach; whereby the threshold was EUR 2  500 (up to 5 December 2011), operations then amounted to \nEUR2  499; and, most recently, with the threshold set at EUR  1 000, transactions amounted to \nEUR  999.  \n\"The money was transferred without any tax trace in Italy\" (as reported by the Judge in the \nmentioned custody order).",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": "When transaction exceeds the threshold (EUR 5,000, EUR 2,500, EUR 1,000)",
+        "constraint": "Must report transactions above the threshold",
+        "context": "Transactions below the threshold are not reported, specific dates for threshold changes (up to 12 August 2011, up to 5 December 2011)"
+      },
+      "amounts": [
+        {
+          "value": 5000.0,
+          "unit": "USD/EUR",
+          "raw": "EUR 5 000"
+        },
+        {
+          "value": 4999.0,
+          "unit": "USD/EUR",
+          "raw": "EUR  4 999"
+        },
+        {
+          "value": 2500.0,
+          "unit": "USD/EUR",
+          "raw": "EUR 2  500"
+        },
+        {
+          "value": 2499.0,
+          "unit": "USD/EUR",
+          "raw": "EUR2  499"
+        },
+        {
+          "value": 1000.0,
+          "unit": "USD/EUR",
+          "raw": "EUR  1 000"
+        },
+        {
+          "value": 999.0,
+          "unit": "USD/EUR",
+          "raw": "EUR  999"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "28",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 12-a",
+      "jurisdiction": "EU",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_12_a_03960_s03",
+      "source_text": "70 \n \n reducing the intensity of monitoring as long as a certain monetary threshold is \nnot reached. As ongoing monitoring is an important means of obtaining more \ninformation on customer risk factors (see above) during the course of a customer \nrelationship, that threshold for both individual transac tions and transactions that \nappear to be linked over the course of 12 months should be set at a level that \nthe firm has assessed as presenting a low risk for both terrorist financing and \nmoney laundering purposes. Guideline 11: Sectoral guideline for money remitters\n11.1.",
+      "components": {
+        "subject": "Firms",
+        "condition": "When the monetary threshold for transactions is reached",
+        "constraint": "Must set the threshold at a level that presents a low risk for both terrorist financing and money laundering purposes",
+        "context": "Over the course of 12 months"
+      },
+      "amounts": [
+        {
+          "value": 12.0,
+          "unit": "MONTHS",
+          "raw": "12 months"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "29",
+      "source_doc": "fatf_mvts_guidance_2016.pdf",
+      "source_article": "Numbered 27",
+      "jurisdiction": "International",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_fatf_mvts_guidance_2_Numbered_27_05040",
+      "source_text": "27. In certain cases, MVTS are also often offered over the i nternet  and there may be no physical \npresence (i.e. head office, branch  or agent  network) in the country where the transaction is sent or \nreceived. Competent authorities of the host jurisdiction in which the MVTS provider provides \nservices without being physically present should liaise with the MVTS’s home authority (which licenses/registers that MVTS provider and in whose jurisdiction, the MVTS provider is incorporated or resides), as appropriate to ensure that any ML/TF concerns are adequately addressed without prejudice to t",
+      "components": {
+        "subject": "Competent authorities of the host jurisdiction and home authority of MVTS providers",
+        "condition": "When MVTS providers operate without physical presence in the host country",
+        "constraint": "Must liaise to address ML/TF concerns and require submission of STRs or other relevant information",
+        "context": "As appropriate, without prejudice to the right of the host country"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 15
+      }
+    },
+    {
+      "id": "30",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 13-f",
+      "jurisdiction": "EU",
+      "chunk_role": "THRESHOLD",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_13_f_03832_s05",
+      "source_text": "The threshold or time limit is set at a reasonably low level (however, firms should note that a low threshold alone may not be sufficient to reduce risk, especially with regard to terrorist financing); they have systems in place to detect when the threshold or time limit has been reached; and they do not defer Customer Due Diligence (CDD) or delay obtaining relevant information about the customer where applicable legislation, such as Regulation (EU) 2015/847 or provisions in national legislation, requires that this information be obtained at the outset.",
+      "components": {
+        "subject": "Firms",
+        "condition": "When the threshold or time limit has been reached",
+        "constraint": "Must have systems in place to detect when the threshold or time limit has been reached and must not defer Customer Due Diligence (CDD) or delay obtaining relevant information about the customer",
+        "context": "At the outset, where applicable legislation requires"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 14
+      }
+    },
+    {
+      "id": "31",
+      "source_doc": "loi_2015_26_aml_cft.pdf",
+      "source_article": "Article 116",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_loi_2015_26_aml_cft_Article_116_03066",
+      "source_text": "Art. 116 - Despite penal sanctions, any violation of the vigilance measures provided in articles 108, 109, 110, 111, 112 and 113 of this law triggers disciplinary proceedings, in accordance with the applicable disciplinary regime for each person. Number 63 Journal Officiel de la République Tunisienne — August 7, 2015 — Page 1759\n- collect and analyze declarations regarding operations and suspicious transactions and notify the follow-up,\n- assist in the elaboration of programs aimed at combating illicit financial circuits and face financing of terrorism and money laundering,\n- participate in re",
+      "components": {
+        "subject": "Reporting entities and persons subject to vigilance measures",
+        "condition": null,
+        "constraint": "Must collect and analyze declarations, assist in program elaboration, participate in research and training, ensure representation and coordination",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 63.0,
+          "unit": "DAYS",
+          "raw": "63 Jour"
+        },
+        {
+          "value": 112.0,
+          "unit": "YEARS",
+          "raw": "112 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "32",
+      "source_doc": "eba_gl_2021_02_risk_factors.pdf",
+      "source_article": "Article 2-k",
+      "jurisdiction": "EU",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_eba_gl_2021_02_risk__Article_2_k_03753",
+      "source_text": "Investors and project owners have been met face -to-face or have been \nintroduced by a regulated financial intermediary (credit institution or investmen t \nfirm) who has carried out a full CDD on all the customers (project owners and \ninvestors)  \nCountry or geographical risk factors  \n17.9. The CSP should take into account  the following risk factors as potentially contributing to \nincreased risk:  \n The CSP has a global reach, matching investors, project owners and projects from different jurisdictions. The funds are derived from personal or business links to a jurisdiction ide ntified \nby c",
+      "components": {
+        "subject": "CSPs",
+        "condition": "When dealing with customers from high-risk jurisdictions or with links to jurisdictions with significant corruption or criminal activities",
+        "constraint": "Must take into account country or geographical risk factors and pay particular attention to jurisdictions known for terrorist activities or subject to financial sanctions",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "33",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Préambule-c",
+      "jurisdiction": "International",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_fatf_recommendations_Pr_ambule_c_04551_s03",
+      "source_text": " 2012- 2025 5 Number\n  Old Number1  \n A – AML/CFT POLICIES AND COORDINATION  \n1 - Assessing risks & applying a risk -based approach *  \n2 R.31  National cooperation and coordination  * \n  B – MONEY LAUNDERING AND CONFISCATION  \n3 R.1 & R.2   Money laundering offence *  \n4 R.3   Confiscation and provisional measures *  \n  C – TERRORIST FINANCING AND FINANCING OF PROLIFERATION  \n5 SRII Terrorist financing offence *  \n6 SRIII  Targeted financial sanctions relate d to terrorism and terrorist \nfinancing  * \n7  Targeted financial sanctions related to proliferation *  \n8 SRVIII  Non -profit organisa",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": null,
+        "constraint": "Must apply a risk-based approach and implement targeted financial sanctions",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 19
+      }
+    },
+    {
+      "id": "34",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 1-b",
+      "jurisdiction": "International",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_1_b_04102",
+      "source_text": "Assessing risks and applying a risk -based approach * \nCountries should identify, assess, and understand the money laundering and terrorist financing \nrisks for the country, and should take action, including designating an authority or mechanism to coordinate actions to assess risks, and apply resources, aimed at ensuring the risks are mitigated effectively. Based on that assessment, countries should apply a risk- based approach \n(RBA) to ensure that measures to prevent or mitigate money laundering and terrorist financing are proportionate to  the risks identified. This approach should be an e",
+      "components": {
+        "subject": "Countries",
+        "condition": null,
+        "constraint": "Must identify, assess, and understand the money laundering and terrorist financing risks, and apply a risk-based approach to ensure measures to prevent or mitigate money laundering and terrorist financing are proportionate to the risks identified",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 18
+      }
+    },
+    {
+      "id": "35",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 14",
+      "jurisdiction": "International",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_14_04117",
+      "source_text": "14. Money or value transfer services *  \nCountries should take measures to ensure that natural or legal persons that provide money or value transfer services (MVTS) are licensed or registered, and subject to effective systems for monitoring and ensuring compliance with the relevant measures calle d for in the FATF \nRecommendations. Countries should take action to identify natural or legal persons that carry out MVTS without a license or registration, and to apply appropriate sanctions.  \nAny natural or legal person working as an agent should also be licensed or registered by a competent author",
+      "components": {
+        "subject": "Natural or legal persons that provide money or value transfer services (MVTS)",
+        "condition": null,
+        "constraint": "Must be licensed or registered, and subject to effective systems for monitoring and ensuring compliance with the relevant measures",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 18
+      }
+    },
+    {
+      "id": "36",
+      "source_doc": "loi_2015_26_aml_cft.pdf",
+      "source_article": "Article 91",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_loi_2015_26_aml_cft_Article_96_03051",
+      "source_text": "Article 91 - Penalties for terrorist offenses expire after 30 years if the acts constitute\n\nArticle 96 - The penalties provided in the preceding articles are extended, as appropriate, to the heads of legal entities, their representatives, agents, associates, and commissioners of accounts whose personal responsibility is established. This does not prevent prosecution of the aforementioned legal entities if it is established that the money laundering operations were carried out on their behalf, or if they derived revenue from these operations or if the money laundering operations were their obje",
+      "components": {
+        "subject": "Heads of legal entities, their representatives, agents, associates, and commissioners of accounts",
+        "condition": "When personal responsibility is established",
+        "constraint": "Are subject to a fine equal to five times the amount of the fine provided for physical persons, and may face increased fine, disciplinary and administrative sanctions",
+        "context": "Fine may be increased to an amount equal to the value of the seized assets, and legal entities may face prohibition of exercising their activity for a determined period or their dissolution"
+      },
+      "amounts": [
+        {
+          "value": 30.0,
+          "unit": "YEARS",
+          "raw": "30 years"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "37",
+      "source_doc": "fatf_correspondent_banking.pdf",
+      "source_article": "Numbered 87-w",
+      "jurisdiction": "International",
+      "chunk_role": "SANCTIONS",
+      "chunk_id": "CHK_fatf_correspondent_b_Numbered_87__03934",
+      "source_text": "FATF black list, UN \nsanctions) .\n\nGuidance  also contains instructions on the proper procedures for fulfilling anti -money \nlaundering obligations and compliance wit h the rules. In addition, t he Italian FIU, in order to ease detection of STRs, produces  guidance on anomalous \nconduct patterns of economic or financial behaviour that may be linked to money laundering or terrorist financing ( e.g., conduct patterns  regardin g possible  loan sharking  issued in 2011 , on ML \nrisk of factoring  issued in 2012, on gambling and betting issued in 2013) . In some cases, the Italian \nFIU issues “ale",
+      "components": {
+        "subject": "Financial institutions",
+        "condition": null,
+        "constraint": "Must comply with AML/CFT requirements and follow guidance on detecting and reporting suspicious transactions",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "38",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 23",
+      "jurisdiction": "International",
+      "chunk_role": "REPORTING",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_23_04127",
+      "source_text": "23. DNFBPs: Other measures *  \nThe requirements set out in Recommendations 18 to 21 apply to all designated non -financial \nbusinesses and professions, subject to the following qualifications:  \n(a) Lawyers, notaries, other independent legal professionals and accountants should be \nrequired to report suspicious transactions when, on behalf of or for a client, they engage in a financial transaction in relation to the activities described in paragrap h (d) of \nRecommendation 22. Countries are strongly encouraged to extend the reporting requirement to the rest of the professional activities of ac",
+      "components": {
+        "subject": "Designated non-financial businesses and professions (e.g. lawyers, notaries, accountants, dealers in precious metals and stones, trust and company service providers)",
+        "condition": "When engaging in specific financial transactions or activities (e.g. on behalf of a client, cash transactions above the applicable threshold, transactions related to certain activities)",
+        "constraint": "Must report suspicious transactions",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 18
+      }
+    },
+    {
+      "id": "39",
+      "source_doc": "basel_aml_sound_management_d353.pdf",
+      "source_article": "Numbered 57",
+      "jurisdiction": "International",
+      "chunk_role": "REPORTING",
+      "chunk_id": "CHK_basel_aml_sound_mana_Numbered_57_03241",
+      "source_text": "57. There should also be established procedures for assessing whether the bank’s statutory \nobligations under recognised suspicious activity reporting regimes require the transaction to be reported \n \n28  See BCP  29, essential criterion 5(f) in  Core principles for effective banking s upervision , September 2012 . \nA revised version of this report was published in June 2017. http://www.bis.org/bcbs/publ/d405.htm 12. Reporting of money laundering and terrorism financing risks to the appropriate law enforcement agency or FIU, and/or supervisory authorities, if necessary. These procedures should",
+      "components": {
+        "subject": "Banks",
+        "condition": "When statutory obligations under recognised suspicious activity reporting regimes require the transaction to be reported",
+        "constraint": "Must report the transaction and ensure confidentiality, swift investigation, and timely production and submission of reports containing relevant information",
+        "context": "Prompt disclosures if suspected crime proceeds remain in an account"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "40",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 4",
+      "jurisdiction": "International",
+      "chunk_role": "REPORTING",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_4_04872_s02",
+      "source_text": "Group -level \ncompliance, audit, and/or AML/CFT functions should be provided with customer, account, and transaction information from branches and subsidiari es when necessary for AML/CFT \npurposes. This should include information and analysis of transactions or activities which \nappear unusual (if such analysis was done); and could include an STR, its underlying \ninformation, or the fact that an STR has been subm itted. Similarly, branches and subsidiaries \nshould receive such information from these group -level functions when relevant and \nappropriate to risk management.",
+      "components": {
+        "subject": "Group-level compliance, audit, and/or AML/CFT functions, branches and subsidiaries",
+        "condition": "When necessary for AML/CFT purposes",
+        "constraint": "Must provide and receive customer, account, and transaction information, including information and analysis of unusual transactions or activities, and STRs",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "41",
+      "source_doc": "fatf_virtual_assets_red_flags.pdf",
+      "source_article": "Numbered 5",
+      "jurisdiction": "International",
+      "chunk_role": "REPORTING",
+      "chunk_id": "CHK_fatf_virtual_assets__Numbered_5_04529",
+      "source_text": "5. Financial, DNFBP , and  VASP regulators , on the other hand, may find these \nindicators useful when preparing  STRs and monitoring for entities’ compliance with \nAML/CFT controls. Where a reporting entity has information indicating the existence \nof one  or more indicators  without logical business explanation , but fails to file an STR \ndespite a customer’s inconsistent explanation or fails to seek clarification on the \ntransaction, competent authorities  may consider  following up with the reporting \nentity  taking into account the latter’s business profile .  4  VIRTUAL ASSETS RED F LAG",
+      "components": {
+        "subject": "Reporting entities",
+        "condition": "When a customer has an inconsistent explanation or when there is no logical business explanation for one or more indicators",
+        "constraint": "Must file an STR or seek clarification on the transaction",
+        "context": "null"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "42",
+      "source_doc": "fatf_virtual_assets_red_flags.pdf",
+      "source_article": "Numbered 11-a",
+      "jurisdiction": "International",
+      "chunk_role": "REPORTING",
+      "chunk_id": "CHK_fatf_virtual_assets__Numbered_11__05152_s02",
+      "source_text": "Size and frequency of transactions   \n Structuring VA  transactions (e.g. exchange or transfer) in small amount s, or in \namounts under record -keeping or reporting thresholds , similar to structuring \ncash transactions.  \n Making multiple high -value transactions – \no in short succession, such as  within a 24 -hour period ;  \no in a staggered and regular pattern, with  no further transactions recorded \nduring a long period afterwards, which is particularly common in \nransomware -related cases ; or  \n                                                             \n1  While a number of red flag",
+      "components": {
+        "subject": "Reporting entities",
+        "condition": "When structuring VA transactions in small amounts or making multiple high-value transactions",
+        "constraint": "Must report suspicious transactions",
+        "context": "Within a 24-hour period or in a staggered and regular pattern"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "43",
+      "source_doc": "fatf_virtual_assets_red_flags.pdf",
+      "source_article": "Préambule-b",
+      "jurisdiction": "International",
+      "chunk_role": "RED_FLAG",
+      "chunk_id": "CHK_fatf_virtual_assets__Pr_ambule_b_05138_s03",
+      "source_text": "Applications for such permission, for all or part of this publication should be made to the FAT Table of Contents  \nAcronyms  2\nIntroduction  3\nMethodology and sources used in drawing up the list of red flag indicators  4\nIssues to note when reading this Report  4\nRed Flag Indicators  5\n5 \n7 \n9 \n12 \n15 Red Flag Indicators Related to Transactions \nRed Flag Indicators Related to Transaction Patterns\nRed Flag Indicators Related to Anonymity \nRed Flag Indicators about Senders o r Recipients \nRed Flag Indicators in the Source of Funds or Wealth \nRed Flag Indicators Related to Geographical Risks 17",
+      "components": {
+        "subject": "Virtual Asset Service Providers (VASPs) and other reporting entities",
+        "condition": null,
+        "constraint": "Must identify and report suspicious transactions and red flag indicators related to money laundering and terrorist financing",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "44",
+      "source_doc": "fatf_virtual_assets_red_flags.pdf",
+      "source_article": "Numbered 8",
+      "jurisdiction": "International",
+      "chunk_role": "RED_FLAG",
+      "chunk_id": "CHK_fatf_virtual_assets__Numbered_8_04532",
+      "source_text": "8. Freestanding red flags such a s those listed below  can be developed or\ncombined with information from operational agencies , which can in turn be further\ndeveloped through a public -private partnership, in a cyclical, evolutionary process\nthat  takes into account the unique risk and conte xt of a jurisdiction , customer type,\nor the reporting entity itself . The mere presence of a red flag indicator is not\nnecessarily a basis for a suspicion of ML or TF, but could prompt further monitoring\nand examination. Ultimately , a client may be able to provide an explanation  to justify\nthe red flag",
+      "components": {
+        "subject": "Reporting entities",
+        "condition": null,
+        "constraint": "Must monitor and examine further when a red flag indicator is present",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "45",
+      "source_doc": "fatf_virtual_assets_red_flags.pdf",
+      "source_article": "Préambule-a",
+      "jurisdiction": "International",
+      "chunk_role": "RED_FLAG",
+      "chunk_id": "CHK_fatf_virtual_assets__Pr_ambule_a_04523",
+      "source_text": "FATF REPORT\nVirtual Assets  \nRed Flag Indicators\nof Money Laundering and \nTerrorist Financing\nSeptember 2020 The Financial Action Task Force (FATF) is an autonomous inter-governmental organization that creates and advocates policies to safeguard the international financial system against money laundering, terrorist financing, and the financing of weapons of mass destruction. The FATF Recommendations are considered the global standard for anti-money laundering (AML) and counter-terrorist financing (CFT). For further information about the FATF, please visit www.fatf-gafi.org\n\nThis document and/o",
+      "components": {
+        "subject": null,
+        "condition": null,
+        "constraint": null,
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    },
+    {
+      "id": "46",
+      "source_doc": "ctaf_rapport_activite_2023.pdf",
+      "source_article": "Numbered 1-f",
+      "jurisdiction": "Tunisia",
+      "chunk_role": "RED_FLAG",
+      "chunk_id": "CHK_ctaf_rapport_activit_Numbered_13_02940",
+      "source_text": "Chapter I: Suspicious Operational Declarations\n\n13. While his real activity consists of organizing online sports betting through gaming platforms,\nregarding the companies \"Beta\" and \"Omega\", investigations have shown that they offer,\nthrough dedicated platforms, payment products and allow the opening of virtual wallets,\nwithout obtaining approval from the Central Bank of Tunisia.\n\nAs for the named \"A\", he is the owner of a gaming hall, whose turnover has significantly increased in 2021 and 2022, which increase is explained by the operations carried out with the online sports betting companies",
+      "components": {
+        "subject": "Reporting entities",
+        "condition": "When suspicious transactions or activities are detected",
+        "constraint": "Must file a suspicious transaction report (STR) with the relevant authority",
+        "context": null
+      },
+      "amounts": [
+        {
+          "value": 2021.0,
+          "unit": "YEARS",
+          "raw": "2021 an"
+        }
+      ],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 13
+      }
+    },
+    {
+      "id": "47",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 15",
+      "jurisdiction": "International",
+      "chunk_role": "RISK_ASSESSMENT",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_15_04118",
+      "source_text": "15. New technologies  \nCountries and financial institutions should identify and assess the money laundering or terrorist financing risks that may arise in relation to (a) the development of new products and new business practices, including new delivery mechanisms, and (b) the u se of new or \ndeveloping technologies for both new and pre -existing products. In the case of financial \ninstitutions, such a risk assessment should take place prior to the launch of the new products, business practices or the use of new or developing technol ogies. They should take appropriate \nmeasures to manage and",
+      "components": {
+        "subject": "Countries and financial institutions",
+        "condition": "When developing or using new products, business practices, or technologies",
+        "constraint": "Must identify and assess money laundering or terrorist financing risks and take appropriate measures to manage and mitigate those risks",
+        "context": "Prior to the launch of the new products, business practices or the use of new or developing technologies"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "48",
+      "source_doc": "fatf_recommendations_2025.pdf",
+      "source_article": "Numbered 12",
+      "jurisdiction": "International",
+      "chunk_role": "RISK_ASSESSMENT",
+      "chunk_id": "CHK_fatf_recommendations_Numbered_12_04167",
+      "source_text": "12. Assessing MF/TF risks  - Financial institutions and DNFBPs should be required to take \nappropriate steps to identify and assess their money laundering and terrorist financing risks (for customers, countries or geographic areas; and products, services, transactions or delivery channels). They should document those assessments in order to be able to demonstrate their \nbasis, keep these assessments up to date, and have appropriate mechanisms to provide risk assessment information to competent authorities and SRBs. The nature and extent of any \n \n6  Where appropriate, PF risk assessments at a",
+      "components": {
+        "subject": "Financial institutions and DNFBPs",
+        "condition": null,
+        "constraint": "Must identify and assess money laundering and terrorist financing risks, document those assessments, and have mechanisms to provide risk assessment information to competent authorities and SRBs",
+        "context": "Risk assessments must be kept up to date and be appropriate and proportionate to the nature and size of the business"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "49",
+      "source_doc": "fatf_mvts_guidance_2016.pdf",
+      "source_article": "Numbered 84-a",
+      "jurisdiction": "International",
+      "chunk_role": "RISK_ASSESSMENT",
+      "chunk_id": "CHK_fatf_mvts_guidance_2_Numbered_84__05786_s04",
+      "source_text": "GUIDANCE FOR A RISK -BASED APPROACH FOR MONEY OR VALUE TRANSFER SERVICES  \n  \n 2016  35  Provide guidelines and assistance to the agent to assess its own compliance \nprogram regime and to develop its own risk assessment based upon its unique risk profile for its products and services, customers, geography, and subagents or outlets (if applicable).  \n Ensure compliance regime adherence to internal policies and external regulation, such as reporting suspicious or attempted suspicious activities, \nlarge transactions, monitoring the risk behaviours described above, reporting and record keeping,",
+      "components": {
+        "subject": "Money or Value Transfer Services",
+        "condition": null,
+        "constraint": "Provide guidelines and assistance to assess compliance program regime, develop risk assessment, ensure compliance regime adherence, and provide prompt attention and remediation of risk behaviours",
+        "context": "Through periodic AML compliance program reviews"
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 17
+      }
+    },
+    {
+      "id": "50",
+      "source_doc": "basel_aml_sound_management_d353.pdf",
+      "source_article": "Numbered 46",
+      "jurisdiction": "International",
+      "chunk_role": "RISK_ASSESSMENT",
+      "chunk_id": "CHK_basel_aml_sound_mana_Numbered_46_03228",
+      "source_text": "46. All banks should have systems in place to detect unusual or suspicious transactions or patterns \nof activity . In establishing scenarios for identifying such activity, a bank shou ld consider the customer’s \nrisk profile developed as a result of the bank’s  risk assessment, information collected during its CDD efforts, \nand other information obtained from law enforcement and other authorities in its  jurisdiction. For example, \na bank may be aware of particular schemes or arrangements to launder proceeds of crime that may have been identified by authorities as oc curring within its jurisdi",
+      "components": {
+        "subject": "Banks",
+        "condition": "When establishing scenarios for identifying unusual or suspicious transactions or patterns of activity",
+        "constraint": "Must have systems in place to detect unusual or suspicious transactions or patterns of activity and design and apply appropriate monitoring tools and controls",
+        "context": null
+      },
+      "amounts": [],
+      "extraction": {
+        "method": "groq_llm",
+        "score": 16
+      }
+    }
+  ]
+}

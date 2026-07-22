@@ -1,0 +1,13 @@
+{
+  "_comment": "Copier en groq_keys.json (gitignoré) et renseigner vos clés. Le client LLM effectue une rotation clé x modèle avec cooldown sur erreur 429. Alternative : variable d'environnement GROQ_API_KEYS (séparées par des virgules).",
+  "keys": [
+    "gsk_REMPLACER_PAR_VOTRE_CLE_GROQ"
+  ],
+  "models": [
+    "openai/gpt-oss-120b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "qwen/qwen3-32b",
+    "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile"
+  ]
+}

@@ -1,0 +1,59 @@
+[
+  {
+    "name": "S1 — VIREMENT_LOCAL normal (attendu: PASS)",
+    "l1_decision": "PASS",
+    "l1_signals": [],
+    "questions": 4,
+    "chunks_raw": 20,
+    "chunks_deduped": 19,
+    "unique_docs": 7,
+    "total_ms": 14943.654298782349,
+    "expected_decision": "PASS",
+    "decision_ok": true
+  },
+  {
+    "name": "S2 — SWIFT Iran sanctions ONU (attendu: BLOCK)",
+    "l1_decision": "BLOCK",
+    "l1_signals": [
+      "SANCTION_UN_INDIVIDUAL_SENDER",
+      "THRESHOLD_STR",
+      "COUNTRY_BLACK_DESTINATION_COUNTRY",
+      "COUNTRY_GREY_SENDER_COUNTRY"
+    ],
+    "questions": 7,
+    "chunks_raw": 35,
+    "chunks_deduped": 31,
+    "unique_docs": 17,
+    "total_ms": 632.6994895935059,
+    "expected_decision": "BLOCK",
+    "decision_ok": true
+  },
+  {
+    "name": "S3 — DEPOT smurfing + billets neufs (attendu: STR)",
+    "l1_decision": "STR",
+    "l1_signals": [
+      "SMURFING_PATTERN"
+    ],
+    "questions": 7,
+    "chunks_raw": 35,
+    "chunks_deduped": 26,
+    "unique_docs": 7,
+    "total_ms": 514.8677825927734,
+    "expected_decision": "STR",
+    "decision_ok": true
+  },
+  {
+    "name": "S4 — MANDAT WU 4000 TND suspect (attendu: STR)",
+    "l1_decision": "KYC",
+    "l1_signals": [
+      "THRESHOLD_KYC"
+    ],
+    "questions": 7,
+    "chunks_raw": 35,
+    "chunks_deduped": 27,
+    "unique_docs": 8,
+    "total_ms": 481.13489151000977,
+    "expected_decision": "STR",
+    "decision_ok": false
+  }
+]

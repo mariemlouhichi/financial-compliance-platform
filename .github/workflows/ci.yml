@@ -1,0 +1,135 @@
+# ============================================================================
+#  Intégration continue — plateforme AML/KYC
+#
+#  Objectif : détecter automatiquement, avant tout déploiement, une erreur de
+#  typage côté interface ou une erreur de syntaxe côté Python.
+#
+#  Les jobs sont volontairement RAPIDES et sans infrastructure : ils ne
+#  démarrent ni Neo4j, ni Weaviate, ni PostgreSQL. Les tests qui exigent ces
+#  services restent lancés manuellement (voir README).
+# ============================================================================
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  # ── Interface : typage strict + build de production ──────────────────────
+  frontend:
+    name: Frontend — typage et build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: project
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: project/package-lock.json
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Vérification du typage (TypeScript)
+        run: npm run typecheck
+
+      - name: Build de production
+        run: npm run build
+
+      - name: Publication du bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: project/dist
+          retention-days: 7
+
+  # ── Backend : syntaxe Python + cohérence des dépendances ─────────────────
+  #  On ne réinstalle PAS torch/docling ici (plusieurs minutes pour un gain
+  #  faible) : la compilation détecte déjà toute erreur de syntaxe.
+  backend:
+    name: Backend — syntaxe et dépendances
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compilation de tous les modules Python
+        run: |
+          python -m compileall -q api level1_rules neo4j_graph
+          python -m compileall -q -l .
+
+      - name: Cohérence des fichiers de dépendances
+        run: |
+          python - <<'PY'
+          import re, pathlib, sys
+          runtime = pathlib.Path("requirements.txt").read_text(encoding="utf-8")
+          dev     = pathlib.Path("requirements-dev.txt").read_text(encoding="utf-8")
+
+          def pkgs(txt):
+              out = set()
+              for line in txt.splitlines():
+                  line = line.split("#")[0].strip()
+                  if not line or line.startswith("-r"):
+                      continue
+                  out.add(re.split(r"[=<>!~\[]", line)[0].strip().lower())
+              return out
+
+          rt, dv = pkgs(runtime), pkgs(dev)
+          print(f"Runtime : {len(rt)} paquets")
+          print(f"Dev     : {len(dv)} paquets supplémentaires")
+
+          # Un paquet ne doit pas être déclaré deux fois avec deux versions
+          doublons = rt & dv
+          if doublons:
+              print(f"ERREUR — déclarés dans les deux fichiers : {doublons}")
+              sys.exit(1)
+
+          for essentiel in ("fastapi", "uvicorn", "psycopg2-binary"):
+              if essentiel not in rt:
+                  print(f"ERREUR — dépendance runtime manquante : {essentiel}")
+                  sys.exit(1)
+          print("Dépendances cohérentes.")
+          PY
+
+      - name: Validation de la configuration Docker Compose
+        run: docker compose config --quiet
+
+  # ── Image du frontend : vérifie que le Dockerfile construit réellement ───
+  #  L'image de l'API n'est pas construite ici : elle nécessite les modèles ML
+  #  et les listes de sanctions, trop volumineux pour le dépôt. Elle est
+  #  construite localement / lors du déploiement.
+  docker-web:
+    name: Docker — image du frontend
+    runs-on: ubuntu-latest
+    needs: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construction de l'image web
+        run: docker build -t aml-web:ci ./project
+
+      - name: Démarrage et sonde de santé
+        run: |
+          docker run -d --name aml_web_ci -p 8080:80 aml-web:ci
+          for i in $(seq 1 15); do
+            if curl -fsS http://localhost:8080/ >/dev/null; then
+              echo "Interface servie correctement."
+              docker rm -f aml_web_ci
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "L'interface n'a pas répondu."
+          docker logs aml_web_ci
+          docker rm -f aml_web_ci
+          exit 1

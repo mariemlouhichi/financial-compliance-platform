@@ -1,0 +1,104 @@
+[
+  {
+    "tx_id": "TX-FRAUD-001",
+    "expected_label": "FRAUDE",
+    "transaction": {
+      "tx_type": "VIREMENT_LOCAL",
+      "amount": 389769.39,
+      "currency": "USD",
+      "sender_name": "Account-100428660",
+      "sender_country": "Congo",
+      "beneficiary_name": "Account-800825340",
+      "destination_country": "Iran",
+      "timestamp": "2022/09/01 00:21",
+      "motive": "Paiement commercial",
+      "has_justification": false,
+      "payment_format": "Cheque"
+    }
+  },
+  {
+    "tx_id": "TX-FRAUD-002",
+    "expected_label": "FRAUDE",
+    "transaction": {
+      "tx_type": "SWIFT",
+      "amount": 29024.33,
+      "currency": "USD",
+      "sender_name": "Account-100428660",
+      "sender_country": "Congo",
+      "beneficiary_name": "Account-805B716C0",
+      "destination_country": "Iran",
+      "timestamp": "2022/09/01 00:03",
+      "motive": "Paiement commercial",
+      "has_justification": false,
+      "payment_format": "Credit Card"
+    }
+  },
+  {
+    "tx_id": "TX-FRAUD-003",
+    "expected_label": "FRAUDE",
+    "transaction": {
+      "tx_type": "SWIFT",
+      "amount": 792.92,
+      "currency": "USD",
+      "sender_name": "Account-100428660",
+      "sender_country": "Congo",
+      "beneficiary_name": "Account-80B39E7B0",
+      "destination_country": "Tunisia",
+      "timestamp": "2022/09/01 00:01",
+      "motive": "Paiement commercial",
+      "has_justification": false,
+      "payment_format": "Credit Card"
+    }
+  },
+  {
+    "tx_id": "TX-NORMAL-001",
+    "expected_label": "NORMALE",
+    "transaction": {
+      "tx_type": "VIREMENT_LOCAL",
+      "amount": 2566.53,
+      "currency": "USD",
+      "sender_name": "Account-802559360",
+      "sender_country": "Tunisia",
+      "beneficiary_name": "Account-8039322E0",
+      "destination_country": "Tunisia",
+      "timestamp": "2022/09/03 09:29",
+      "motive": "Paiement commercial",
+      "has_justification": true,
+      "payment_format": "Cheque"
+    }
+  },
+  {
+    "tx_id": "TX-NORMAL-002",
+    "expected_label": "NORMALE",
+    "transaction": {
+      "tx_type": "DEPOT_ESPECES",
+      "amount": 104.04,
+      "currency": "USD",
+      "sender_name": "Account-801176C70",
+      "sender_country": "Tunisia",
+      "beneficiary_name": "Account-812C805B0",
+      "destination_country": "Tunisia",
+      "timestamp": "2022/09/01 04:54",
+      "motive": "Paiement commercial",
+      "has_justification": true,
+      "payment_format": "Cash"
+    }
+  },
+  {
+    "tx_id": "TX-NORMAL-003",
+    "expected_label": "NORMALE",
+    "transaction": {
+      "tx_type": "VIREMENT_LOCAL",
+      "amount": 37768.01,
+      "currency": "TND",
+      "sender_name": "Account-100428780",
+      "sender_country": "Tunisia",
+      "beneficiary_name": "Account-805FE48A0",
+      "destination_country": "Tunisia",
+      "timestamp": "2022/09/02 18:30",
+      "motive": "Paiement commercial",
+      "has_justification": true,
+      "payment_format": "Cheque"
+    }
+  }
+]

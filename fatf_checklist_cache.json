@@ -1,0 +1,492 @@
+{
+  "1": {
+    "rec_id": "R1",
+    "number": 1,
+    "title": "Assessing risks and applying a risk-based approach",
+    "description": "Les banques doivent identifier, évaluer et comprendre leurs risques de blanchiment d argent et de financement du terrorisme, et appliquer une approche fondée sur les risques pour les atténuer.",
+    "tx_types": [],
+    "keywords": [
+      "risk assessment",
+      "risk-based approach",
+      "national risk",
+      "RBA",
+      "inherent risk",
+      "residual risk",
+      "risk appetite"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "6": {
+    "rec_id": "R6",
+    "number": 6,
+    "title": "Targeted financial sanctions related to terrorism and terrorist financing",
+    "description": "Les banques doivent geler sans délai les fonds des personnes et entités désignées pour terrorisme par les Nations Unies, et appliquer des interdictions de financement.",
+    "tx_types": [
+      "SWIFT"
+    ],
+    "keywords": [
+      "targeted financial sanctions",
+      "asset freeze",
+      "UN designation",
+      "terrorism financing sanctions",
+      "blocking",
+      "UNSCR 1267",
+      "UNSCR 1373",
+      "sanctions list",
+      "designated person"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "7": {
+    "rec_id": "R7",
+    "number": 7,
+    "title": "Targeted financial sanctions related to proliferation",
+    "description": "Les institutions financières doivent appliquer des sanctions financières ciblées et geler les avoirs des personnes impliquées dans le financement de la prolifération des armes de destruction massive.",
+    "tx_types": [
+      "SWIFT"
+    ],
+    "keywords": [
+      "proliferation financing",
+      "WMD",
+      "weapons of mass destruction",
+      "proliferation sanctions",
+      "UNSCR 1718",
+      "UNSCR 2231",
+      "nuclear weapons",
+      "ballistic missiles"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "10": {
+    "rec_id": "R10",
+    "number": 10,
+    "title": "Customer due diligence",
+    "description": "Les banques doivent faire preuve de vigilance à l égard de la clientèle, ce qui inclut l identification et la vérification de l identité des clients et des bénéficiaires effectifs.",
+    "tx_types": [
+      "SWIFT",
+      "VIREMENT_LOCAL",
+      "DEPOT_ESPECES",
+      "MANDAT"
+    ],
+    "keywords": [
+      "customer due diligence",
+      "CDD",
+      "identification",
+      "verification",
+      "beneficial owner",
+      "beneficial ownership",
+      "KYC",
+      "identity",
+      "ongoing due diligence",
+      "customer identification program"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "11": {
+    "rec_id": "R11",
+    "number": 11,
+    "title": "Record keeping",
+    "description": "Les institutions financières doivent conserver pendant au moins cinq ans tous les documents transactionnels et les données d identification des clients.",
+    "tx_types": [
+      "SWIFT",
+      "VIREMENT_LOCAL",
+      "DEPOT_ESPECES",
+      "MANDAT"
+    ],
+    "keywords": [
+      "record keeping",
+      "records",
+      "documentation",
+      "retention",
+      "five years",
+      "data retention",
+      "archive",
+      "transaction records",
+      "customer files"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "12": {
+    "rec_id": "R12",
+    "number": 12,
+    "title": "Politically exposed persons",
+    "description": "Les banques doivent appliquer des mesures de vigilance accrues à l égard des personnes politiquement exposées, notamment en identifiant l origine de leurs fonds et en obtenant l approbation de la haute direction.",
+    "tx_types": [
+      "SWIFT"
+    ],
+    "keywords": [
+      "politically exposed",
+      "PEP",
+      "senior official",
+      "public function",
+      "prominent function",
+      "senior management approval",
+      "source of wealth",
+      "enhanced measures PEP"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "13": {
+    "rec_id": "R13",
+    "number": 13,
+    "title": "Correspondent banking",
+    "description": "Les banques doivent évaluer les contrôles de conformité de leurs correspondants bancaires étrangers et comprendre pleinement la nature de leurs activités avant d établir une relation.",
+    "tx_types": [
+      "SWIFT"
+    ],
+    "keywords": [
+      "correspondent banking",
+      "respondent institution",
+      "payable-through",
+      "correspondent bank",
+      "nostro account",
+      "correspondent relationship",
+      "due diligence respondent"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "14": {
+    "rec_id": "R14",
+    "number": 14,
+    "title": "Money or value transfer services",
+    "description": "Les prestataires de services de transfert d argent doivent être enregistrés et faire l objet d une surveillance, garantissant la légitimité des canaux de paiement.",
+    "tx_types": [
+      "MANDAT"
+    ],
+    "keywords": [
+      "money value transfer",
+      "MVTS",
+      "money transfer service",
+      "remittance",
+      "money order",
+      "transfer operator",
+      "hawala",
+      "money service business",
+      "MSB"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "15": {
+    "rec_id": "R15",
+    "number": 15,
+    "title": "New technologies",
+    "description": "Les institutions financières doivent identifier et évaluer les risques liés au développement de nouveaux produits, ainsi qu aux nouvelles technologies incluant les actifs virtuels.",
+    "tx_types": [],
+    "keywords": [
+      "new technologies",
+      "virtual assets",
+      "cryptocurrency",
+      "fintech",
+      "digital asset",
+      "VASP",
+      "blockchain",
+      "crypto exchange"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "16": {
+    "rec_id": "R16",
+    "number": 16,
+    "title": "Wire transfers",
+    "description": "Les institutions financières doivent s assurer que les paiements ou transferts de fonds sont accompagnés d informations exactes sur le donneur d ordre et le bénéficiaire.",
+    "tx_types": [
+      "SWIFT",
+      "MANDAT"
+    ],
+    "keywords": [
+      "wire transfer",
+      "travel rule",
+      "originator information",
+      "cross-border transfer",
+      "beneficiary information",
+      "international transfer",
+      "ordering institution",
+      "intermediary bank"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "17": {
+    "rec_id": "R17",
+    "number": 17,
+    "title": "Reliance on third parties",
+    "description": "Les banques peuvent s appuyer sur des tiers pour exécuter certaines mesures de vigilance à l égard de la clientèle, tout en conservant la responsabilité finale de ces contrôles.",
+    "tx_types": [],
+    "keywords": [
+      "third party reliance",
+      "outsourcing",
+      "introduced business",
+      "reliance",
+      "third party CDD",
+      "agent reliance",
+      "delegating CDD"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "18": {
+    "rec_id": "R18",
+    "number": 18,
+    "title": "Internal controls and foreign branches and subsidiaries",
+    "description": "Les groupes financiers doivent mettre en oeuvre des programmes internes robustes de lutte contre le blanchiment à l échelle du groupe, y compris des fonctions d audit et de partage d informations.",
+    "tx_types": [],
+    "keywords": [
+      "internal controls",
+      "compliance programme",
+      "AML programme",
+      "foreign branches",
+      "subsidiaries",
+      "group policy",
+      "internal audit",
+      "compliance officer"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "19": {
+    "rec_id": "R19",
+    "number": 19,
+    "title": "Higher-risk countries",
+    "description": "Les banques doivent appliquer des mesures de vigilance renforcées lors des relations d affaires et des transactions impliquant des clients de pays identifiés comme étant à haut risque.",
+    "tx_types": [
+      "SWIFT",
+      "MANDAT"
+    ],
+    "keywords": [
+      "high-risk country",
+      "higher-risk",
+      "blacklist",
+      "grey list",
+      "countermeasures",
+      "enhanced measures",
+      "FATF list",
+      "increased monitoring",
+      "strategic deficiencies"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "20": {
+    "rec_id": "R20",
+    "number": 20,
+    "title": "Reporting of suspicious transactions",
+    "description": "Les institutions financières ont l obligation légale de déclarer promptement à la cellule de renseignement financier toute transaction qu elles soupçonnent d être liée à une activité criminelle.",
+    "tx_types": [
+      "SWIFT",
+      "VIREMENT_LOCAL",
+      "DEPOT_ESPECES",
+      "MANDAT"
+    ],
+    "keywords": [
+      "suspicious transaction",
+      "STR",
+      "SAR",
+      "suspicious activity",
+      "reporting obligation",
+      "CTAF",
+      "declaration",
+      "filing",
+      "FIU report",
+      "suspicious activity report"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "21": {
+    "rec_id": "R21",
+    "number": 21,
+    "title": "Tipping-off and confidentiality",
+    "description": "Les banques et leurs employés ont l interdiction stricte de divulguer à un client qu une déclaration de soupçon le concernant a été transmise aux autorités.",
+    "tx_types": [],
+    "keywords": [
+      "tipping-off",
+      "confidentiality",
+      "disclosure prohibition",
+      "secrecy",
+      "not disclose",
+      "safe harbour",
+      "good faith disclosure"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "22": {
+    "rec_id": "R22",
+    "number": 22,
+    "title": "Designated non-financial businesses and professions - Customer due diligence",
+    "description": "Étend les obligations de vigilance à l égard de la clientèle aux entreprises et professions non financières désignées, comme les casinos, les avocats et les agents immobiliers.",
+    "tx_types": [],
+    "keywords": [
+      "DNFBP",
+      "designated non-financial",
+      "real estate agent",
+      "lawyer",
+      "accountant",
+      "notary",
+      "trust service",
+      "casino",
+      "dealer precious metals"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "23": {
+    "rec_id": "R23",
+    "number": 23,
+    "title": "Designated non-financial businesses and professions - Other measures",
+    "description": "Applique d autres exigences de conformité dont le contrôle interne et les déclarations de soupçons aux entreprises et professions non financières désignées.",
+    "tx_types": [],
+    "keywords": [
+      "DNFBP other measures",
+      "designated non-financial business",
+      "STR DNFBP",
+      "suspicious reporting non-financial",
+      "professional obligations"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "24": {
+    "rec_id": "R24",
+    "number": 24,
+    "title": "Transparency and beneficial ownership of legal persons",
+    "description": "Exige une transparence adéquate afin que les banques et les autorités puissent accéder rapidement aux informations sur les bénéficiaires effectifs des sociétés et autres structures morales.",
+    "tx_types": [
+      "SWIFT"
+    ],
+    "keywords": [
+      "beneficial ownership legal person",
+      "company ownership",
+      "shareholder register",
+      "legal entity transparency",
+      "corporate ownership",
+      "shell company",
+      "nominee"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "25": {
+    "rec_id": "R25",
+    "number": 25,
+    "title": "Transparency and beneficial ownership of legal arrangements",
+    "description": "Impulse des mesures pour empêcher l utilisation abusive des constructions juridiques comme les trusts et garantit que les informations sur leurs bénéficiaires effectifs sont accessibles.",
+    "tx_types": [],
+    "keywords": [
+      "beneficial ownership trust",
+      "legal arrangement",
+      "trust transparency",
+      "fiduciary",
+      "nominee arrangement",
+      "express trust",
+      "trustee"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "27": {
+    "rec_id": "R27",
+    "number": 27,
+    "title": "Powers of supervisors",
+    "description": "Les autorités de contrôle doivent disposer des pouvoirs nécessaires pour inspecter les institutions financières, vérifier leur conformité LBC/FT et imposer des sanctions si besoin.",
+    "tx_types": [],
+    "keywords": [
+      "supervisory powers",
+      "inspection",
+      "on-site examination",
+      "off-site monitoring",
+      "sanction supervisory",
+      "supervisor enforcement"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "29": {
+    "rec_id": "R29",
+    "number": 29,
+    "title": "Financial intelligence units",
+    "description": "Les pays doivent établir une cellule de renseignement financier indépendante pour la réception, l analyse et la diffusion des déclarations de transactions suspectes émises par les banques.",
+    "tx_types": [],
+    "keywords": [
+      "financial intelligence unit",
+      "FIU",
+      "CTAF",
+      "financial analysis",
+      "intelligence unit",
+      "suspicious report analysis",
+      "financial analysis commission"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "32": {
+    "rec_id": "R32",
+    "number": 32,
+    "title": "Cash couriers",
+    "description": "Réglemente le transport physique transfrontalier d espèces et d instruments au porteur avec des systèmes de déclaration obligatoires.",
+    "tx_types": [
+      "DEPOT_ESPECES"
+    ],
+    "keywords": [
+      "cash courier",
+      "cash declaration",
+      "border declaration",
+      "cross-border cash",
+      "physical currency transport",
+      "bearer negotiable instruments",
+      "cash smuggling"
+    ],
+    "relevance": "HIGH",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  },
+  "35": {
+    "rec_id": "R35",
+    "number": 35,
+    "title": "Sanctions",
+    "description": "Les manquements des institutions financières à leurs obligations de lutte contre le blanchiment doivent faire l objet de sanctions efficaces, proportionnées et dissuasives.",
+    "tx_types": [],
+    "keywords": [
+      "administrative sanctions",
+      "criminal sanctions",
+      "penalties",
+      "dissuasive sanctions",
+      "proportionate sanctions",
+      "effective sanctions",
+      "AML penalties"
+    ],
+    "relevance": "MEDIUM",
+    "source_doc": "fatf_recommendations_2025.pdf",
+    "found_in_corpus": true
+  }
+}

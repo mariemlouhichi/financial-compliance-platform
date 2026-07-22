@@ -1,0 +1,166 @@
+{
+  "sar_id": "SAR-FA14FDF6",
+  "generated_at": "2026-06-28T01:33:04.388397",
+  "declarant_bank": "Banque Tunisienne (PFE 2025-2026)",
+  "decision_trigger": "STR",
+  "recommendation": "DÉCLARER À LA CTAF — Soupçon de blanchiment, déclaration obligatoire dans les 48h",
+  "risk_score_compliance": 75.0,
+  "risk_score_ml": 84.0,
+  "risk_score_combined": 78.6,
+  "risk_level": "ÉLEVÉ",
+  "transaction": {
+    "type": "DEPOT_ESPECES",
+    "amount": 4700,
+    "currency": "TND",
+    "sender": "Mohamed Trabelsi",
+    "sender_country": "Tunisia",
+    "beneficiary": "Banque BCT",
+    "beneficiary_country": "Tunisia",
+    "motive": "Dépôt en espèces",
+    "has_justification": false,
+    "timestamp": "2026-05-18T16:45:00"
+  },
+  "client_profile": {
+    "client_id": "CLT-S3-002",
+    "level": "MOYEN",
+    "score": 45.0,
+    "is_pep": false,
+    "kyc_complete": false,
+    "prior_strs": true
+  },
+  "client_risk_level": "MOYEN",
+  "client_factors": [
+    "prior_strs",
+    "incomplete_kyc"
+  ],
+  "fatca_obligation": "",
+  "violated_rules": [
+    {
+      "rule_text": "Détection de fractionnement : 3 dépôts sous 5 000 TND en 24h pour le même client",
+      "source": "bct_circulaire_2006_19.pdf",
+      "is_bct_binding": true,
+      "article_ref": "Article 8",
+      "fatf_rec": "R20",
+      "severity": "HIGH",
+      "cross_validated": true,
+      "provenance": "SYMBOLIC"
+    },
+    {
+      "rule_text": "Déclaration de soupçon à la CTAF obligatoire pour toute opération inhabituelle",
+      "source": "loi_2015_26.pdf",
+      "is_bct_binding": true,
+      "article_ref": "Article 107",
+      "fatf_rec": "R20",
+      "severity": "HIGH",
+      "cross_validated": false,
+      "provenance": "SYMBOLIC"
+    }
+  ],
+  "respected_rules": [
+    {
+      "rule_text": "Seuil déclaration espèces 10k",
+      "source": "bct_circulaire_2017_08",
+      "is_bct_binding": true,
+      "article_ref": "Art.43",
+      "fatf_rec": "R20",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Identification client",
+      "source": "loi_2003_75",
+      "is_bct_binding": true,
+      "article_ref": "Art.7",
+      "fatf_rec": "R10",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Justification origine fonds",
+      "source": "bct_circulaire_2006_19",
+      "is_bct_binding": true,
+      "article_ref": "Art.10",
+      "fatf_rec": "R10",
+      "status": "CONFORME"
+    },
+    {
+      "rule_text": "Conservation pièces",
+      "source": "bct_circulaire_2017_08",
+      "is_bct_binding": true,
+      "article_ref": "Art.45",
+      "fatf_rec": "R11",
+      "status": "CONFORME"
+    }
+  ],
+  "applicable_rules_count": 4,
+  "coverage_fatf": 92.0,
+  "coverage_bct": 85.0,
+  "ml_top_features": [
+    {
+      "feature": "sender_fanout_ratio",
+      "value": 0.92,
+      "shap": 11.2,
+      "pushes": "FRAUDE",
+      "interpretation": "Émetteur diversifie vers de nombreux récepteurs (pattern smurfing)"
+    },
+    {
+      "feature": "is_round_100",
+      "value": 0,
+      "shap": 4.3,
+      "pushes": "FRAUDE",
+      "interpretation": "Indicateur statistique"
+    },
+    {
+      "feature": "is_cash",
+      "value": 1,
+      "shap": 3.8,
+      "pushes": "FRAUDE",
+      "interpretation": "Indicateur statistique"
+    },
+    {
+      "feature": "reconstruction_error",
+      "value": 2.1,
+      "shap": 2.9,
+      "pushes": "FRAUDE",
+      "interpretation": "Séquence temporelle anormale détectée par l'autoencoder LSTM"
+    },
+    {
+      "feature": "amount_vs_sender_mean",
+      "value": 1.6,
+      "shap": 1.5,
+      "pushes": "FRAUDE",
+      "interpretation": "Montant anormal par rapport à l'historique de l'émetteur"
+    }
+  ],
+  "ml_decision": "FRAUDE_SUSPECTÉE",
+  "required_documents": [
+    "Justificatif économique de l'opération (facture, contrat)",
+    "Dossier KYC complet (CIN, justificatif domicile)",
+    "Formulaire goAML pour transmission CTAF"
+  ],
+  "narrative": "La transaction DEPOT_ESPECES d'un montant de 4,700 TND de Mohamed Trabelsi (Tunisia) vers Banque BCT (Tunisia) a été évaluée par le système AML/KYC.\n\n**Décision système** : STR (score combiné 78.6/100, niveau ÉLEVÉ).\n\n**Profil client** : niveau de risque structurel MOYEN (score 45/100). PEP : non. KYC : INCOMPLET. STR antérieurs : OUI.\n\n**2 obligation(s) violée(s)** :\n  • [⚖️BCT] bct_circulaire_2006_19.pdf Article 8 (réf. FATF R20) : Détection de fractionnement : 3 dépôts sous 5 000 TND en 24h pour le même client\n  • [⚖️BCT] loi_2015_26.pdf Article 107 (réf. FATF R20) : Déclaration de soupçon à la CTAF obligatoire pour toute opération inhabituelle\n\n**Analyse ML** : probabilité de fraude 84.0/100 (FRAUDE_SUSPECTÉE).\nFacteurs ML dominants :\n  • sender_fanout_ratio (FRAUDE) : Émetteur diversifie vers de nombreux récepteurs (pattern smurfing)\n  • is_round_100 (FRAUDE) : Indicateur statistique\n  • is_cash (FRAUDE) : Indicateur statistique\n\n**Recommandation** : DÉCLARER À LA CTAF — Soupçon de blanchiment, déclaration obligatoire dans les 48h",
+  "audit_trail": [
+    {
+      "step": "compliance_agent",
+      "decision": "STR",
+      "score": 75.0,
+      "violations": 2
+    },
+    {
+      "step": "ml_fraud_detector",
+      "score": 84.0,
+      "decision": "FRAUDE_SUSPECTÉE"
+    },
+    {
+      "step": "client_scoring",
+      "level": "MOYEN",
+      "factors": [
+        "prior_strs",
+        "incomplete_kyc"
+      ]
+    },
+    {
+      "step": "fusion",
+      "formula": "max(ca, 0.6*ca + 0.4*ml)",
+      "combined": 78.6
+    }
+  ]
+}

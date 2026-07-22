@@ -1,0 +1,74 @@
+# ============================================================================
+#  Contexte de build Docker — ce qui NE DOIT PAS être envoyé au démon.
+#  Sans ce fichier, le contexte pèse ~3 Go (venv 1,9 Go + data 943 Mo).
+#  Avec, il tombe à ~120 Mo.
+# ============================================================================
+
+# ── Environnements et dépendances (réinstallés dans l'image) ───────────────
+venv/
+.venv/
+env/
+**/node_modules/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Données volumineuses inutiles au runtime ───────────────────────────────
+# Source brute OpenSanctions (853 Mo) : sert UNIQUEMENT à construire
+# data/peps.json via build_peps_json.py. Le produit fini, lui, est embarqué.
+data/entities.ftm.json
+
+# Embeddings déjà indexés dans Weaviate (114 Mo)
+output/chunks_with_embeddings.json
+
+# Sauvegardes et fichiers de travail
+**/*.bck_*
+**/*.backup_*
+**/*.bak
+output/par_document/
+output/llm_cache.json
+output/jobs/
+
+# ── Modèles ML non utilisés au runtime ─────────────────────────────────────
+# Seule la famille aml_ml_demo_* est chargée par l'API.
+aml_ml_fixed_*
+aml_ml_v4_final_*
+aml_ml_lgb.txt
+aml_ml_xgb.json
+aml_ml_meta.json
+*.pkl.DISABLED
+
+# ── Secrets (injectés par variables d'environnement / volumes) ─────────────
+smtp_config.json
+db_config.json
+groq_keys.json
+platform.db
+output/api_secret.key
+
+# ── Développement, docs et artefacts ───────────────────────────────────────
+.git/
+.gitignore
+.github/
+docs_soutenance/
+sars/
+*.md
+!requirements*.txt
+eval_*.log
+eval_*.txt
+resultats_*.json
+rapport_*.md
+.vscode/
+.idea/
+*.log
+
+# ── Frontend : construit dans son propre Dockerfile ────────────────────────
+project/dist/
+project/.vite/
+
+# ── Docker lui-même ────────────────────────────────────────────────────────
+Dockerfile*
+docker-compose*.yml
+.dockerignore
