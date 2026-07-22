@@ -1,0 +1,109 @@
+# ============================================================================
+#  .gitignore — plateforme AML/KYC
+#
+#  Trois catégories d'exclusion :
+#    1. SECRETS      — ne doivent JAMAIS être publiés
+#    2. VOLUMINEUX   — dépassent ou approchent les limites GitHub (100 Mo)
+#    3. GÉNÉRÉS      — reconstructibles, inutiles dans l'historique
+# ============================================================================
+
+# ─────────────────────────────────────────────────────────────────────────
+#  1. SECRETS — jamais de commit
+# ─────────────────────────────────────────────────────────────────────────
+# ATTENTION : dans un .gitignore, « # » ne commence un commentaire qu'en DÉBUT
+# de ligne. Un commentaire en fin de ligne ferait partie du motif et le rendrait
+# inopérant — jamais de commentaire à droite d'un motif.
+
+# clés API LLM (réelles)
+groq_keys.json
+# identifiants de messagerie
+smtp_config.json
+# mot de passe PostgreSQL
+db_config.json
+# comptes utilisateurs + empreintes de mots de passe
+platform.db
+# clé de signature des jetons de session
+output/api_secret.key
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!**/tailwind.config.js
+
+# ─────────────────────────────────────────────────────────────────────────
+#  2. FICHIERS VOLUMINEUX
+# ─────────────────────────────────────────────────────────────────────────
+# Source brute OpenSanctions (853 Mo) — sert uniquement à générer peps.json
+data/entities.ftm.json
+
+# Jeu PEP dérivé (83 Mo) — reconstructible : python build_peps_json.py
+data/peps.json
+
+# Embeddings (114 Mo) — déjà indexés dans Weaviate
+output/chunks_with_embeddings.json
+
+# Environnements et dépendances
+venv/
+.venv/
+env/
+ENV/
+node_modules/
+
+# ─────────────────────────────────────────────────────────────────────────
+#  3. FICHIERS GÉNÉRÉS
+# ─────────────────────────────────────────────────────────────────────────
+# Dossiers d'analyse (désormais en PostgreSQL) et rapports produits
+output/jobs/
+output/llm_cache.json
+output/par_document/
+sars/
+
+# Sauvegardes de travail
+*.bck_*
+*.backup_*
+*.bak
+*~
+
+# Résultats d'évaluation (regénérables)
+resultats_*.json
+rapport_*.md
+eval_*.log
+eval_*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Frontend
+project/dist/
+project/.vite/
+*.local
+
+# Éditeurs et système
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ─────────────────────────────────────────────────────────────────────────
+#  Variantes historiques de modèles ML (41 Mo) — non chargées par l'API.
+#  Seule la famille aml_ml_demo_* est utilisée en production
+#  (api/main.py : MLPredictor(prefix="aml_ml_demo")).
+#  Conservées en local, exclues du dépôt pour l'alléger.
+# ─────────────────────────────────────────────────────────────────────────
+aml_ml_fixed_*
+aml_ml_v4_final_*
+aml_ml_lgb.txt
+aml_ml_xgb.json
+aml_ml_meta.json
