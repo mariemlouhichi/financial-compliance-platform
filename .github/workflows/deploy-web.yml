@@ -1,0 +1,65 @@
+# ============================================================================
+#  CI/CD — Construit l'image du frontend et la PUBLIE dans Azure Container
+#  Registry à chaque push (branche staged/main) ou sur déclenchement manuel.
+#
+#  Auth : identifiants ADMIN de l'ACR (secrets GitHub) — PAS de service
+#  principal, car l'abonnement Azure for Students en interdit la création.
+#
+#  Secrets GitHub requis (Settings → Secrets and variables → Actions) :
+#     ACR_USERNAME  = amlkyclouhichi2026
+#     ACR_PASSWORD  = (az acr credential show --name amlkyclouhichi2026
+#                       --query "passwords[0].value" -o tsv)
+#
+#  Le déploiement final (nouvelle révision) se fait ensuite en une commande —
+#  il exigerait un service principal pour être automatisé, non autorisé ici :
+#     az containerapp update --name aml-web --resource-group aml-kyc-rg \
+#        --image amlkyclouhichi2026.azurecr.io/aml-web:latest \
+#        --revision-suffix ci$(date +%m%d%H%M)
+# ============================================================================
+name: Build & push web image
+
+on:
+  push:
+    branches: [staged, main]
+    paths:
+      - 'project/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:      # bouton « Run workflow » dans l'onglet Actions
+
+env:
+  ACR_LOGIN_SERVER: amlkyclouhichi2026.azurecr.io
+  IMAGE: amlkyclouhichi2026.azurecr.io/aml-web:latest
+  # URL publique de l'API Azure, figée dans le bundle au build (non secrète).
+  API_URL: https://aml-api.mangoisland-00189a40.francecentral.azurecontainerapps.io
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Connexion à l'Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build + push de l'image web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./project
+          file: ./project/Dockerfile
+          push: true
+          provenance: false          # image simple (comme en local)
+          build-args: |
+            VITE_API_BASE_URL=${{ env.API_URL }}
+          tags: ${{ env.IMAGE }}
+
+      - name: Rappel du déploiement
+        run: |
+          echo "Image publiée : ${{ env.IMAGE }}"
+          echo "Pour déployer : az containerapp update --name aml-web \\"
+          echo "   --resource-group aml-kyc-rg --image ${{ env.IMAGE }} \\"
+          echo "   --revision-suffix ci\$(date +%m%d%H%M)"
