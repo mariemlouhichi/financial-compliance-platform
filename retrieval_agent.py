@@ -63,6 +63,11 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "amlkyc2025")
 WEAVIATE_HOST      = os.getenv("WEAVIATE_HOST",      "localhost")
 WEAVIATE_HTTP_PORT = int(os.getenv("WEAVIATE_HTTP_PORT", "8088"))
 WEAVIATE_GRPC_PORT = int(os.getenv("WEAVIATE_GRPC_PORT", "50051"))
+# Mode CLOUD : si WEAVIATE_URL est défini, on se connecte au cluster distant
+# (TLS + clé API) au lieu du conteneur local. Permet de basculer entre
+# développement local et déploiement sans toucher au code.
+WEAVIATE_URL       = os.getenv("WEAVIATE_URL", "").strip()
+WEAVIATE_API_KEY   = os.getenv("WEAVIATE_API_KEY", "").strip()
 COLLECTION_NAME    = "AMLChunk"
 
 # Modèles
@@ -234,13 +239,27 @@ class RetrievalPipeline:
     def weaviate(self):
         if self._weaviate is None:
             import weaviate
-            self._weaviate = weaviate.connect_to_local(
-                host=WEAVIATE_HOST,
-                port=WEAVIATE_HTTP_PORT,
-                grpc_port=WEAVIATE_GRPC_PORT,
-            )
-            if self.verbose:
-                print(f"  ✅ Weaviate connecté ({WEAVIATE_HOST}:{WEAVIATE_HTTP_PORT})")
+            if WEAVIATE_URL:
+                # Cluster distant (Weaviate Cloud) : TLS + authentification.
+                # Délais élargis : le contrôle gRPC par défaut (~2 s) échoue
+                # sur une connexion lente ou depuis Azure (latence réseau).
+                from weaviate.classes.init import Auth, AdditionalConfig, Timeout
+                self._weaviate = weaviate.connect_to_weaviate_cloud(
+                    cluster_url=WEAVIATE_URL,
+                    auth_credentials=Auth.api_key(WEAVIATE_API_KEY),
+                    additional_config=AdditionalConfig(
+                        timeout=Timeout(init=60, query=120, insert=300)),
+                )
+                if self.verbose:
+                    print(f"  ✅ Weaviate Cloud connecté ({WEAVIATE_URL})")
+            else:
+                self._weaviate = weaviate.connect_to_local(
+                    host=WEAVIATE_HOST,
+                    port=WEAVIATE_HTTP_PORT,
+                    grpc_port=WEAVIATE_GRPC_PORT,
+                )
+                if self.verbose:
+                    print(f"  ✅ Weaviate connecté ({WEAVIATE_HOST}:{WEAVIATE_HTTP_PORT})")
         return self._weaviate
 
     @property

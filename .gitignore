@@ -22,6 +22,8 @@ smtp_config.json
 db_config.json
 # comptes utilisateurs + empreintes de mots de passe
 platform.db
+# base de comptes de démo embarquée dans l'image (empreintes de mots de passe)
+platform_seed.db
 # clé de signature des jetons de session
 output/api_secret.key
 
@@ -111,3 +113,6 @@ aml_ml_meta.json
 # Artefacts d'exécution du planificateur et des cycles de réentraînement
 output/retraining/
 output/scheduler_state.json
+
+# Identifiants des services cloud (Neo4j Aura, Weaviate Cloud, Upstash)
+cloud_env.ps1

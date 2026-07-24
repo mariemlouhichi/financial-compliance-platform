@@ -94,7 +94,7 @@ cp smtp_config.example.json smtp_config.json  # optionnel (emails)
 docker compose up -d --build
 ```
 
-- Interface : http://localhost:8080
+- Interface : http://localhost:8090
 - API : http://localhost:8001
 
 ### En développement
@@ -148,9 +148,10 @@ documentées :
 - La **couverture-preuve réelle** en production est d'environ 28 % ; le reste des
   obligations est couvert symboliquement.
 - Les **poids de scoring sont une calibration**, pas une source réglementaire.
-- La **boucle d'apprentissage par retour humain n'est pas fermée** : le feedback
-  des superviseurs est collecté et structuré, le réentraînement automatique reste
-  à brancher.
+- La **boucle d'apprentissage par retour humain est automatisée** (cycle
+  hebdomadaire planifié, refus de réentraîner sous 20 étiquettes, garde-fou de
+  dérive quotidien) ; seule l'**exécution** du réentraînement dépend de la
+  disponibilité du jeu d'entraînement.
 - Le modèle ML est entraîné sur un **jeu de données public** (IBM AML), pas sur
   des données bancaires réelles.
 - **Pas d'OCR** : les justificatifs scannés ne sont pas lus.

@@ -20,7 +20,7 @@ est déployable tel quel sur Azure.
 ## 2. Architecture cible
 
 ```
-                    http://localhost:8080
+                    http://localhost:8090
                             │
                             ▼
               ┌──────────────────────────┐
@@ -165,7 +165,7 @@ base64, ce qui gonfle la taille d'environ 33 %) et `proxy_read_timeout 300s` sur
 # Tout construire et démarrer
 docker compose up -d --build
 
-# Interface :  http://localhost:8080
+# Interface :  http://localhost:8090
 # API        :  http://localhost:8001
 ```
 

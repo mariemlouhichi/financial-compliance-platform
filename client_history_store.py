@@ -144,12 +144,19 @@ class _RedisBackend:
             pass
 
 
+#  2 s suffisent en local, mais pas pour un Redis CLOUD : la latence réseau et
+#  la poignée de main TLS dépassent souvent ce délai, et l'échec est silencieux
+#  (repli mémoire) — l'historique de fractionnement serait alors perdu à chaque
+#  redémarrage. Surchargeable par REDIS_CONNECT_TIMEOUT.
+REDIS_CONNECT_TIMEOUT = float(os.getenv("REDIS_CONNECT_TIMEOUT", "5"))
+
+
 def _connect_redis(url: str, verbose: bool):
     """Tente une connexion Redis. Retourne le client ou None (repli mémoire)."""
     try:
         import redis  # type: ignore
         client = redis.Redis.from_url(url, decode_responses=True,
-                                      socket_connect_timeout=2)
+                                      socket_connect_timeout=REDIS_CONNECT_TIMEOUT)
         client.ping()
         if verbose:
             print(f"  ✅ Redis connecté ({url})")

@@ -151,20 +151,41 @@ def create_weaviate_collection(client):
     """
     import weaviate.classes.config as wvc
 
-    # Supprimer la collection si elle existe déjà (réindexation propre)
+    # REPRISE : par défaut, si la collection existe déjà on la CONSERVE — un
+    # import interrompu (connexion instable) peut ainsi être repris en
+    # relançant le script, sans tout réindexer. Les UUID déterministes
+    # (voir index_to_weaviate) garantissent l'absence de doublons.
+    # Passer --fresh pour forcer une réindexation propre depuis zéro.
     if client.collections.exists(COLLECTION_NAME):
-        client.collections.delete(COLLECTION_NAME)
-        print(f"   🗑️  Deleted existing collection '{COLLECTION_NAME}'")
+        if "--fresh" in sys.argv:
+            client.collections.delete(COLLECTION_NAME)
+            print(f"   🗑️  Collection '{COLLECTION_NAME}' supprimée (--fresh)")
+        else:
+            deja = client.collections.get(COLLECTION_NAME).aggregate.over_all(
+                total_count=True).total_count
+            print(f"   ♻️  Collection '{COLLECTION_NAME}' déjà présente "
+                  f"({deja} objets) — reprise (upsert). --fresh pour repartir de zéro.")
+            return
+
+    # Type d'index vectoriel selon la cible :
+    #  • Weaviate Cloud gratuit (« Cost Optimized ») n'autorise QUE `hfresh`,
+    #    or le client 4.10.4 ne connaît que hnsw/flat/dynamic → on crée alors
+    #    la collection par un appel REST direct imposant hfresh.
+    #  • En local (Docker), on garde HNSW via le client typé.
+    _sur_cloud = bool(os.getenv("WEAVIATE_URL", "").strip())
+    if _sur_cloud:
+        _create_collection_cloud_hfresh()
+        return
+
+    _index_vectoriel = wvc.Configure.VectorIndex.hnsw(
+        distance_metric=wvc.VectorDistances.COSINE)
 
     client.collections.create(
         name=COLLECTION_NAME,
         description="AML/KYC regulatory chunks with BGE-base embeddings",
         # Pas de vectorizer — on fournit nos propres vecteurs
         vectorizer_config=wvc.Configure.Vectorizer.none(),
-        # Index vectoriel HNSW (par défaut, optimal pour notre taille)
-        vector_index_config=wvc.Configure.VectorIndex.hnsw(
-            distance_metric=wvc.VectorDistances.COSINE,
-        ),
+        vector_index_config=_index_vectoriel,
         # Propriétés du schéma
         properties=[
             wvc.Property(
@@ -219,47 +240,128 @@ def create_weaviate_collection(client):
     print(f"   ✅ Collection '{COLLECTION_NAME}' created\n")
 
 
+def _create_collection_cloud_hfresh():
+    """Crée la collection sur Weaviate Cloud via l'API REST, avec l'index
+    `hfresh` (seul autorisé par le profil gratuit). Le client Python 4.10.4
+    ne sait créer que hnsw/flat/dynamic ; on contourne par un POST direct.
+    Distance COSINE (embeddings BGE normalisés). Idempotent : si la classe
+    existe déjà, on ne fait rien (la reprise s'appuie dessus).
+    """
+    import requests
+    url = os.environ["WEAVIATE_URL"].rstrip("/")
+    key = os.environ.get("WEAVIATE_API_KEY", "").strip()
+    headers = {"Authorization": f"Bearer {key}",
+               "Content-Type": "application/json"}
+
+    # Déjà présente ? (reprise)
+    r = requests.get(f"{url}/v1/schema/{COLLECTION_NAME}", headers=headers,
+                     timeout=60)
+    if r.status_code == 200:
+        print(f"   ♻️  Collection '{COLLECTION_NAME}' déjà présente (cloud) — reprise")
+        return
+
+    def prop(nom, dtype, filt=False, search=False, desc=""):
+        return {"name": nom, "dataType": [dtype], "description": desc,
+                "indexFilterable": filt, "indexSearchable": search}
+
+    classe = {
+        "class": COLLECTION_NAME,
+        "description": "AML/KYC regulatory chunks with BGE-base embeddings",
+        "vectorizer": "none",
+        "vectorIndexType": "hfresh",        # imposé par le profil gratuit
+        "vectorIndexConfig": {"distance": "cosine"},
+        "properties": [
+            # text DOIT être searchable : la recherche hybride fait du BM25
+            # (mots-clés) dessus. Sans indexSearchable, le gRPC échoue.
+            prop("text", "text", filt=True, search=True,
+                 desc="Chunk text content"),
+            prop("source_doc", "text", filt=True, search=True),
+            prop("article_ref", "text", filt=True, search=True),
+            prop("jurisdiction", "text", filt=True),
+            prop("chunk_role", "text", filt=True),
+            prop("has_threshold", "boolean", filt=True),
+            prop("chunk_index", "int"),
+            prop("char_count", "int"),
+        ],
+    }
+    resp = requests.post(f"{url}/v1/schema", headers=headers, json=classe,
+                         timeout=90)
+    if resp.status_code not in (200, 201):
+        raise RuntimeError(
+            f"Création REST échouée (HTTP {resp.status_code}) : {resp.text[:300]}")
+    print(f"   ✅ Collection '{COLLECTION_NAME}' créée sur le cloud (index hfresh)\n")
+
+
 def index_to_weaviate(client, chunks: list, embeddings: list):
     """
-    Importe tous les chunks dans Weaviate en batch avec leurs vecteurs.
+    Importe tous les chunks dans Weaviate, de façon RÉSILIENTE.
 
-    Utilise le batch dynamique de Weaviate v4 qui ajuste automatiquement
-    la taille des batches pour optimiser le débit.
+    Sur une connexion instable, le batch gRPC dynamique perd silencieusement
+    des objets (ils n'apparaissent même pas dans failed_objects). On procède
+    donc en PLUSIEURS PASSES : à chaque passe on relit ce qui est réellement
+    présent côté serveur (UUID déterministes) et on ne renvoie QUE le manque,
+    en lots de taille fixe et à faible concurrence (plus fiable). On s'arrête
+    quand le compte serveur atteint la cible.
     """
+    import time
+    from weaviate.util import generate_uuid5
     collection = client.collections.get(COLLECTION_NAME)
+    total = len(chunks)
 
-    print(f"📤 Indexing {len(chunks)} chunks into Weaviate...")
+    # Pré-calcul : (uuid, propriétés, vecteur) pour chaque chunk.
+    tous = []
+    for chunk, emb in zip(chunks, embeddings):
+        tous.append((
+            str(generate_uuid5(chunk["chunk_id"])),
+            {
+                "text": chunk["text"],
+                "source_doc": chunk["source_doc"],
+                "article_ref": chunk["article_ref"],
+                "jurisdiction": chunk["jurisdiction"],
+                "chunk_role": chunk["chunk_role"],
+                "has_threshold": chunk["has_threshold"],
+                "chunk_index": chunk["chunk_index"],
+                "char_count": chunk["char_count"],
+            },
+            emb,
+        ))
 
-    failed_count = 0
-    with collection.batch.dynamic() as batch:
-        for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
-            batch.add_object(
-                properties={
-                    "text": chunk["text"],
-                    "source_doc": chunk["source_doc"],
-                    "article_ref": chunk["article_ref"],
-                    "jurisdiction": chunk["jurisdiction"],
-                    "chunk_role": chunk["chunk_role"],
-                    "has_threshold": chunk["has_threshold"],
-                    "chunk_index": chunk["chunk_index"],
-                    "char_count": chunk["char_count"],
-                },
-                vector=embedding,
-            )
+    print(f"📤 Indexing {total} chunks into Weaviate (multi-passes)...")
 
-            if (i + 1) % 500 == 0:
-                print(f"   [{i + 1}/{len(chunks)}]", end="\r")
+    for passe in range(1, 9):
+        # Ce qui est DÉJÀ présent côté serveur (source de vérité).
+        existants = set()
+        try:
+            for obj in collection.iterator(return_properties=[]):
+                existants.add(str(obj.uuid))
+        except Exception as e:
+            print(f"   ⚠️  lecture des UUID existants partielle ({type(e).__name__})")
 
-        # Vérifier les erreurs
-        failed = collection.batch.failed_objects
-        if failed:
-            failed_count = len(failed)
-            print(f"\n   ⚠️  {failed_count} objects failed to import")
-            print(f"   First error: {failed[0]}")
+        manquants = [t for t in tous if t[0] not in existants]
+        if not manquants:
+            print(f"   ✅ tous les objets sont présents ({len(existants)})")
+            break
 
-    success = len(chunks) - failed_count
-    print(f"   ✅ {success}/{len(chunks)} chunks indexed successfully\n")
-    return success
+        print(f"   passe {passe} : {len(existants)} présents · {len(manquants)} à envoyer")
+        try:
+            with collection.batch.fixed_size(batch_size=200,
+                                             concurrent_requests=2) as batch:
+                for uid, props, vec in manquants:
+                    batch.add_object(uuid=uid, properties=props, vector=vec)
+            fails = collection.batch.failed_objects
+            if fails:
+                print(f"      {len(fails)} objet(s) rejeté(s) — réessayés à la passe suivante")
+        except Exception as e:
+            print(f"      interruption ({type(e).__name__}) — on repart de ce qui est passé")
+        time.sleep(6)   # laisser l'index HFRESH se stabiliser avant de recompter
+
+    final = collection.aggregate.over_all(total_count=True).total_count
+    if final >= total:
+        print(f"   ✅ {final}/{total} chunks indexés\n")
+    else:
+        print(f"   ⚠️  {final}/{total} seulement — RELANCE la commande pour "
+              f"envoyer le reste (reprise automatique)\n")
+    return final
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -315,22 +417,88 @@ def main():
         chunks = json.load(f)
     print(f"   → {len(chunks)} chunks loaded\n")
 
-    # ── 2. Charger le modèle et calculer les embeddings ──
-    model = load_embedding_model()
-    embeddings = compute_embeddings(chunks, model)
+    # ── 2. Embeddings : RÉUTILISER le calcul précédent si possible ──
+    #  Recalculer 6 678 vecteurs prend une dizaine de minutes de CPU pour un
+    #  résultat identique. Si le fichier de sauvegarde existe et correspond au
+    #  même nombre de chunks, on le relit — utile notamment pour réindexer un
+    #  cluster Weaviate Cloud recréé après expiration du sandbox.
+    embeddings = None
+    if "--recompute" not in sys.argv and os.path.exists(EMBEDDINGS_BACKUP):
+        try:
+            print(f"♻️  Réutilisation des embeddings : {EMBEDDINGS_BACKUP}")
+            with open(EMBEDDINGS_BACKUP, "r", encoding="utf-8") as f:
+                sauvegarde = json.load(f)
+            items = sauvegarde if isinstance(sauvegarde, list) \
+                else sauvegarde.get("chunks", [])
+            if len(items) == len(chunks) and items and "embedding" in items[0]:
+                embeddings = [it["embedding"] for it in items]
+                # Le fichier de sauvegarde porte les champs PLATS attendus par
+                # l'indexation (text, source_doc, …), contrairement à
+                # chunks_aml_kyc.json (imbriqué). On aligne donc chunks dessus.
+                chunks = items
+                print(f"   → {len(embeddings)} vecteurs relus "
+                      f"({len(embeddings[0])} dimensions) — calcul évité\n")
+            else:
+                print("   → sauvegarde incompatible, recalcul nécessaire\n")
+        except Exception as e:
+            print(f"   → relecture impossible ({e}), recalcul\n")
 
-    # ── 3. Sauvegarder le backup local ──
-    save_embeddings_backup(chunks, embeddings, EMBEDDINGS_BACKUP)
+    if embeddings is None:
+        model = load_embedding_model()
+        embeddings = compute_embeddings(chunks, model)
+        # ── 3. Sauvegarder le backup local ──
+        save_embeddings_backup(chunks, embeddings, EMBEDDINGS_BACKUP)
 
     # ── 4. Connecter à Weaviate et indexer ──
     import weaviate
 
-    print(f"\n🔌 Connecting to Weaviate at {WEAVIATE_HOST}:{WEAVIATE_HTTP_PORT}...")
-    client = weaviate.connect_to_local(
-        host=WEAVIATE_HOST,
-        port=WEAVIATE_HTTP_PORT,
-        grpc_port=WEAVIATE_GRPC_PORT,
-    )
+    # Cloud si WEAVIATE_URL est défini (migration vers Weaviate Cloud),
+    # sinon conteneur local — même script pour les deux cibles.
+    _CLOUD_URL = os.getenv("WEAVIATE_URL", "").strip()
+    if _CLOUD_URL:
+        from weaviate.classes.init import Auth, AdditionalConfig, Timeout
+        print(f"\n🔌 Connecting to Weaviate Cloud at {_CLOUD_URL}...")
+        # Connexion RÉSILIENTE : sur une connexion instable, l'établissement
+        # TCP/TLS échoue par intermittence (ConnectTimeout). On réessaie
+        # plusieurs fois, et skip_init_checks=True allège chaque tentative
+        # (pas de ping gRPC ni de /meta à faire échouer au démarrage).
+        client = None
+        derniere = None
+        for tentative in range(1, 9):
+            try:
+                client = weaviate.connect_to_weaviate_cloud(
+                    cluster_url=_CLOUD_URL,
+                    auth_credentials=Auth.api_key(
+                        os.getenv("WEAVIATE_API_KEY", "").strip()),
+                    additional_config=AdditionalConfig(
+                        timeout=Timeout(init=90, query=120, insert=600)),
+                    skip_init_checks=True,
+                )
+                client.is_ready()   # force un aller-retour REST une fois connecté
+                print(f"   ✅ connecté (tentative {tentative})")
+                break
+            except Exception as e:
+                derniere = e
+                print(f"   … tentative {tentative} échouée "
+                      f"({type(e).__name__}), nouvel essai dans 5 s")
+                try:
+                    if client:
+                        client.close()
+                except Exception:
+                    pass
+                client = None
+                time.sleep(5)
+        if client is None:
+            print(f"\n❌ Connexion impossible après plusieurs tentatives : {derniere}")
+            print("   Vérifie ta connexion et relance — l'import reprend sans doublon.")
+            sys.exit(1)
+    else:
+        print(f"\n🔌 Connecting to Weaviate at {WEAVIATE_HOST}:{WEAVIATE_HTTP_PORT}...")
+        client = weaviate.connect_to_local(
+            host=WEAVIATE_HOST,
+            port=WEAVIATE_HTTP_PORT,
+            grpc_port=WEAVIATE_GRPC_PORT,
+        )
 
     try:
         if not client.is_ready():

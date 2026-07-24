@@ -115,6 +115,12 @@ COPY aml_ml_demo_*   ./
 COPY clients_db.json fatf_checklist_cache.json ./
 COPY output/chunks_aml_kyc.json ./output/
 
+# Comptes de démonstration pré-vérifiés (généré par seed_accounts.py).
+# Sur Azure Container Apps le stockage est éphémère et platform.db n'est PAS
+# monté → ces comptes survivent aux redémarrages. En local, docker-compose monte
+# le vrai platform.db, qui prend le dessus sur celui-ci.
+COPY platform_seed.db ./platform.db
+
 # Dossiers d'écriture (dossiers de secours, cache LLM, cache modèles)
 RUN mkdir -p output/jobs sars .cache/huggingface
 

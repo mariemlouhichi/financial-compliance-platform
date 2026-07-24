@@ -2,19 +2,26 @@
 #  Contexte de build Docker — ce qui NE DOIT PAS être envoyé au démon.
 #  Sans ce fichier, le contexte pèse ~3 Go (venv 1,9 Go + data 943 Mo).
 #  Avec, il tombe à ~120 Mo.
+#
+#  ⚠️ IMPORTANT — motifs de DOSSIER SANS « / » final.
+#  Le packer d'`az acr build` (Azure CLI) n'honore PAS « venv/ » (slash final) :
+#  il n'exclut le dossier que si le motif est « venv » (sans slash). Docker
+#  local tolère les deux, mais on écrit la forme compatible avec les deux.
 # ============================================================================
 
 # ── Environnements et dépendances (réinstallés dans l'image) ───────────────
-venv/
-.venv/
-env/
-**/node_modules/
-**/__pycache__/
+venv
+**/venv
+.venv
+**/.venv
+env
+**/node_modules
+**/__pycache__
 *.py[cod]
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+*.egg-info
+.pytest_cache
+.mypy_cache
+.ruff_cache
 
 # ── Données volumineuses inutiles au runtime ───────────────────────────────
 # Source brute OpenSanctions (853 Mo) : sert UNIQUEMENT à construire
@@ -28,9 +35,9 @@ output/chunks_with_embeddings.json
 **/*.bck_*
 **/*.backup_*
 **/*.bak
-output/par_document/
+output/par_document
 output/llm_cache.json
-output/jobs/
+output/jobs
 
 # ── Modèles ML non utilisés au runtime ─────────────────────────────────────
 # Seule la famille aml_ml_demo_* est chargée par l'API.
@@ -49,24 +56,24 @@ platform.db
 output/api_secret.key
 
 # ── Développement, docs et artefacts ───────────────────────────────────────
-.git/
+.git
 .gitignore
-.github/
-docs_soutenance/
-sars/
+.github
+docs_soutenance
+sars
 *.md
 !requirements*.txt
 eval_*.log
 eval_*.txt
 resultats_*.json
 rapport_*.md
-.vscode/
-.idea/
+.vscode
+.idea
 *.log
 
 # ── Frontend : construit dans son propre Dockerfile ────────────────────────
-project/dist/
-project/.vite/
+project/dist
+project/.vite
 
 # ── Docker lui-même ────────────────────────────────────────────────────────
 Dockerfile*

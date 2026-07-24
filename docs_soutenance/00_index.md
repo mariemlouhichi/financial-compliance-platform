@@ -58,6 +58,7 @@ passages de ces fichiers sont périmés.
 |---|----------|---------|
 | **20** | [Simulateur et scénarios](20_simulateur_scenarios.md) | Flux continu, scénario clients réels, 14 cas de démonstration |
 | **23** | [Conteneurisation et CI](23_conteneurisation_ci.md) | Images Docker, nginx + SSE, docker-compose complet, GitHub Actions |
+| **24** | [Déploiement sur Azure](24_deploiement_azure.md) | Container Apps, PostgreSQL Flexible, bases externes gratuites, secrets, CORS, push d'image |
 | **08** | [Arborescence du projet](08_arborescence.md) | Structure des dossiers et fichiers |
 | **07** | [Points 1, 2, 5 (historique)](07_points_1_2_5.md) | Ancien point d'avancement — contenu réparti dans les docs thématiques |
 | **22** | [**Évolutions depuis juin**](22_evolutions_depuis_juin.md) | **Ce qui a changé dans les docs 01-08** + synthèse des bugs corrigés |
@@ -116,10 +117,9 @@ Rappel                       :  0,9421
   couvert symboliquement, sans citation verbatim rattachée.
 - **Les poids de scoring sont une calibration**, pas une source réglementaire.
   Seule la *structure* de la formule est réglementaire (FATF/Bâle).
-- **La boucle RLHF n'est pas fermée** : le feedback est collecté et structuré,
-  le réentraînement automatique reste à brancher (cadence retenue :
-  hebdomadaire, avec garde-fou anti-dérive).
-- **Le rapport hebdomadaire n'est pas encore planifié** automatiquement.
+- **La boucle RLHF est automatisée** (cycle hebdomadaire, garde-fou de dérive
+  quotidien), mais l'**exécution** du réentraînement reste conditionnée à la
+  présence du jeu d'entraînement, trop volumineux pour être embarqué.
 - **Le ML est entraîné sur un jeu public** (IBM AML), pas sur des données
   bancaires tunisiennes réelles.
 - **Pas d'OCR** : les justificatifs scannés ne sont pas lus.
@@ -133,7 +133,7 @@ cd C:\Users\louhi\Downloads\projet_pfe\02_chunking_v2
 
 # ── Tout en conteneurs (recommandé) ──────────────────────
 docker compose up -d --build
-#    Interface : http://localhost:8080
+#    Interface : http://localhost:8090
 #    API       : http://localhost:8001
 
 # ── Ou en développement (rechargement à chaud) ───────────
@@ -152,4 +152,4 @@ python test_smtp.py          # envoi email
 
 ---
 
-*Dossier de soutenance — mis à jour le 22 juillet 2026.*
+*Dossier de soutenance — mis à jour le 24 juillet 2026.*
