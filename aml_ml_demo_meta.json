@@ -1,5 +1,5 @@
 {
-  "threshold": 0.9999998327725299,
+  "threshold": 0.9999998591150959,
   "features": [
     "amount",
     "amount_log",
@@ -37,20 +37,21 @@
     "is_unique_pair",
     "sender_fanout_ratio",
     "receiver_fanin_ratio",
-    "reconstruction_error"
+    "reconstruction_error",
+    "isolation_score"
   ],
-  "n_features": 37,
+  "n_features": 38,
   "metrics": {
     "name": "LightGBM seul + LSTM-AE",
-    "pr_auc": 0.9527775961596101,
-    "f1": 0.9639506172839506,
-    "precision": 0.9868554095045501,
-    "recall": 0.9420849420849421,
-    "tp": 976,
-    "fp": 13,
-    "fn": 60,
-    "tn": 118952,
-    "threshold": 0.9999998327725299
+    "pr_auc": 0.9518080177381166,
+    "f1": 0.9563511525257479,
+    "precision": 0.9720837487537388,
+    "recall": 0.9411196911196911,
+    "tp": 975,
+    "fp": 28,
+    "fn": 61,
+    "tn": 118937,
+    "threshold": 0.9999998591150959
   },
   "models": {
     "lightgbm": "aml_ml_demo_lgb.txt"

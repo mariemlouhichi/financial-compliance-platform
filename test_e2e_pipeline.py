@@ -98,6 +98,19 @@ class MLPredictor:
         self.sample = pd.read_csv(BASE / f"{prefix}_sample.csv")
         self.history_store = history_store
 
+        # BRANCHE C : Isolation Forest (anomalies non supervisées) — chargé
+        # s'il a été produit au training (train_demo_ml.py). Sert à calculer la
+        # feature 'isolation_score' au runtime, pour TOUS les clients.
+        self._iforest = None
+        iforest_path = BASE / f"{prefix}_iforest.pkl"
+        if iforest_path.exists():
+            try:
+                import joblib
+                self._iforest = joblib.load(iforest_path)
+                print(f"  ✓ Isolation Forest chargé ({iforest_path.name})")
+            except Exception as e:
+                print(f"  ⚠️ Isolation Forest illisible ({e})")
+
         # NOUVEAU (Étape C) : charge le calibrateur s'il existe
         self.calibrator = None
         self.calibration_method = None
@@ -237,6 +250,21 @@ class MLPredictor:
                 if agg_feat in feat and agg_feat in self.sample.columns:
                     feat[agg_feat] = float(self.sample[agg_feat].median())
         
+        # ── Branche C : Isolation Forest → isolation_score (runtime) ──
+        #  Calculé sur les features déjà construites → marche pour TOUS les
+        #  clients (y compris les nouveaux, sans historique).
+        if self._iforest is not None and "isolation_score" in self.features:
+            try:
+                _cols = self._iforest["columns"]
+                _Xif = np.array([[float(feat.get(c, 0.0) or 0.0) for c in _cols]],
+                                dtype=float)
+                _raw = float(self._iforest["model"].score_samples(_Xif)[0])
+                _lo, _hi = self._iforest["lo"], self._iforest["hi"]
+                _rng = (_hi - _lo) or 1.0
+                feat["isolation_score"] = max(0.0, min(1.0, (_hi - _raw) / _rng))
+            except Exception:
+                pass
+
         # ── C. Prédiction LightGBM ────────────────────────────────────
         X = np.array([[feat.get(f, 0.0) for f in self.features]],
                      dtype=np.float32)
@@ -274,6 +302,7 @@ class MLPredictor:
             "profile_status": profile_status,
             "history_size": history_size,
             "used_lstm_ae": use_real_history,
+            "isolation_score": round(float(feat.get("isolation_score", 0.0)), 4),
             "all_features": dict(feat),   # NOUVEAU : vecteur complet (Fix 6.5)
         }
     

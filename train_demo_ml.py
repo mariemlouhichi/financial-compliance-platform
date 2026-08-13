@@ -51,6 +51,17 @@ def main():
         feature_cols = feature_cols + ["reconstruction_error"]
         print(f"  → reconstruction_error ajoutée (feature #{len(feature_cols)})")
 
+    # ── Branche C : Isolation Forest → isolation_score ─────────────────
+    #  Signal d'anomalie NON supervisé qui marche pour TOUS les clients
+    #  (y compris les nouveaux, sans historique).
+    iso_train, iso_test = ml.build_isolation_forest_features(
+        X_train, y_train, X_test, y_test, prefix=PREFIX)
+    X_train = X_train.copy(); X_test = X_test.copy()
+    X_train["isolation_score"] = iso_train
+    X_test["isolation_score"] = iso_test
+    feature_cols = feature_cols + ["isolation_score"]
+    print(f"  → isolation_score ajoutée (feature #{len(feature_cols)})")
+
     # ── Entraîner LightGBM seul ────────────────────────────────────────
     print(f"\n{'='*70}")
     print(f"  ENTRAÎNEMENT — LightGBM (architecture finale)")

@@ -550,6 +550,62 @@ def build_autoencoder_features(X_train, y_train, X_test,
     return err_train, err_test
 
 
+def build_isolation_forest_features(X_train, y_train, X_test, y_test,
+                                    prefix: str = "aml_ml_demo",
+                                    contamination: float = 0.02):
+    """
+    BRANCHE C (non-supervisé) — Isolation Forest → 'isolation_score' comme feature.
+
+    Complète l'autoencoder : détecte les OUTLIERS sur le vecteur tabulaire.
+    Contrairement au LSTM-AE (qui exige un historique de séquences), l'Isolation
+    Forest score une transaction ISOLÉE → il fonctionne pour TOUS les clients,
+    y compris les NOUVEAUX (sans historique) — là où le pipeline retombait sur
+    des médianes sans signal.
+
+    Entraîné sur les transactions NORMALES uniquement (y==0), comme l'AE, puis
+    SAUVÉ pour le runtime (<prefix>_iforest.pkl : modèle + colonnes + bornes).
+
+    Retour : (iso_train, iso_test) — score d'anomalie 0..1 (+ haut = + anormal).
+    """
+    from sklearn.ensemble import IsolationForest
+    import joblib
+
+    print(f"\n  BRANCHE C — Isolation Forest (outliers, non supervisé)")
+
+    cols = list(X_train.columns)          # features de base (+ reconstruction_error)
+    Xtr = X_train[cols].apply(pd.to_numeric, errors="coerce").fillna(0.0)
+    Xte = X_test[cols].apply(pd.to_numeric, errors="coerce").fillna(0.0)
+
+    # Fit UNIQUEMENT sur les transactions normales (même principe que l'AE).
+    mask_normal = np.asarray(y_train) == 0
+    normal = Xtr[mask_normal]
+    iforest = IsolationForest(n_estimators=200, contamination=contamination,
+                              random_state=42, n_jobs=-1).fit(normal)
+
+    # Normalisation 0..1 à partir des scores des normales (+ haut = + anormal).
+    s_norm = iforest.score_samples(normal)
+    lo, hi = float(s_norm.min()), float(s_norm.max())
+    rng = (hi - lo) or 1.0
+
+    def _to_anom(X):
+        return np.clip((hi - iforest.score_samples(X)) / rng, 0.0, 1.0)
+
+    iso_train, iso_test = _to_anom(Xtr), _to_anom(Xte)
+
+    # Sauvegarde pour le runtime (MLPredictor rechargera ce fichier).
+    joblib.dump({"model": iforest, "columns": cols, "lo": lo, "hi": hi},
+                f"{prefix}_iforest.pkl")
+
+    # Diagnostic : les fraudes ont-elles un score d'anomalie plus élevé ?
+    yte = np.asarray(y_test)
+    if yte.sum() > 0 and (yte == 0).sum() > 0:
+        print(f"    Score anomalie moyen — fraude : {iso_test[yte == 1].mean():.3f} "
+              f"· normale : {iso_test[yte == 0].mean():.3f}")
+    print(f"    ✅ Entraîné sur {len(normal):,} normales → 'isolation_score' "
+          f"(sauvé : {prefix}_iforest.pkl)")
+    return iso_train, iso_test
+
+
 def build_lstm_autoencoder_features(train_raw, test_raw,
                                      window: int = 8, epochs: int = 20,
                                      batch_size: int = 1024):
