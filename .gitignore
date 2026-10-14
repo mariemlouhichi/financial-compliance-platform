@@ -116,3 +116,6 @@ output/scheduler_state.json
 
 # Identifiants des services cloud (Neo4j Aura, Weaviate Cloud, Upstash)
 cloud_env.ps1
+
+# Rapport PFE et presentation : hors depot
+Rapport/

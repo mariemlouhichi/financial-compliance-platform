@@ -30,7 +30,7 @@ env:
   ACR_LOGIN_SERVER: amlkyclouhichi2026.azurecr.io
   IMAGE: amlkyclouhichi2026.azurecr.io/aml-web:latest
   # URL publique de l'API Azure, figée dans le bundle au build (non secrète).
-  API_URL: https://aml-api.mangoisland-00189a40.francecentral.azurecontainerapps.io
+  API_URL: https://aml-api.victoriousdesert-c30c7927.francecentral.azurecontainerapps.io
 
 jobs:
   build-push:

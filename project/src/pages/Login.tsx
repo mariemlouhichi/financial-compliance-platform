@@ -9,11 +9,11 @@
 // serveur backend (uvicorn) — indiqué à l'écran.
 // ============================================================================
 import { useState } from 'react';
-import { Shield, Mail, LockKeyhole, UserPlus, LogIn, KeyRound } from 'lucide-react';
+import { Mail, LockKeyhole, UserPlus, LogIn, KeyRound } from 'lucide-react';
 import { api } from '../api/client';
 import { saveSession, type Role, ROLE_LABELS, type Session } from '../auth';
 
-const ROLES: Role[] = ['USER', 'ADMIN', 'COMPLIANCE_OFFICER', 'AUDITOR'];
+const ROLES: Role[] = ['USER', 'ADMIN', 'COMPLIANCE_OFFICER'];
 type Mode = 'login' | 'register' | 'verify' | 'forgot' | 'reset';
 
 export function LoginPage({ onLogin }: { onLogin: (s: Session) => void }) {
@@ -82,12 +82,14 @@ export function LoginPage({ onLogin }: { onLogin: (s: Session) => void }) {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#152c4d] px-4">
       <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 rounded-2xl bg-slate-900 p-3">
-            <Shield size={28} className="text-emerald-400" />
-          </div>
-          <h1 className="text-xl font-bold text-slate-900">Financial Compliance Platform</h1>
+          {/* La carte de connexion est blanche : le logo s'y intègre directement. */}
+          <img src="/lexiq-logo.png" alt="LexIQ" className="mb-3 h-11 w-auto" />
           <p className="mt-1 text-xs text-slate-500">
-            Plateforme Multi-Agent pour la Surveillance Intelligente des Opérations Financières
+            Plateforme multi-agents pour la surveillance intelligente
+            des opérations financières
+          </p>
+          <p className="mt-2 text-[11px] font-semibold tracking-wide text-slate-500">
+            VERMEG
           </p>
         </div>
 

@@ -693,6 +693,10 @@ class SymbolicReasoner:
                 rule_status=status,
                 source_doc=gt.get("source_doc", ""),
                 rule_ref=gt.get("source_article") or gt.get("name", ""),
+                # [Front] extrait verbatim du graphe (source_text_snippet ancré
+                # lors de la construction du graphe) → carte avec citation ❝❞.
+                source_snippet=gt.get("snippet", "") or "",
+                snippet_verbatim=bool((gt.get("snippet") or "").strip()),
                 threshold=threshold, threshold_unit=currency,
                 confidence=float(gt.get("confidence", 0.9)),
                 pass2_completed=True,
@@ -734,6 +738,9 @@ class SymbolicReasoner:
             rule_status=status,
             source_doc=gt.get("source_doc", ""),
             rule_ref=gt.get("source_article") or gt.get("name", ""),
+            # [Front] extrait verbatim du graphe → carte avec citation ❝❞.
+            source_snippet=gt.get("snippet", "") or "",
+            snippet_verbatim=bool((gt.get("snippet") or "").strip()),
             threshold=threshold,
             threshold_unit=currency,
             confidence=float(gt.get("confidence", 0.9)),
@@ -1096,10 +1103,51 @@ class SemanticReasoner:
                 r.violated = False
                 r.reasoning = (r.reasoning or "") + " [downgraded: conf<0.65]"
 
+    def _rule_quality_ok(self, rule) -> bool:
+        """
+        [Étape 2 — JUGE DE QUALITÉ] La règle extraite est-elle une VRAIE
+        obligation réglementaire (un sujet DOIT / NE DOIT PAS faire une action —
+        modalité déontique), ou seulement du texte DESCRIPTIF, une définition ou
+        du contexte ? Complète l'ancrage verbatim (étape 1) avant d'enrichir le
+        graphe → un rulebase plus propre.
+
+        Piloté par $env:RULE_QUALITY_JUDGE (défaut : actif).
+        Repli SÛR : si le juge est indisponible, on laisse passer (la règle est
+        déjà ancrée verbatim → l'étape 1 fait foi).
+        """
+        if os.getenv("RULE_QUALITY_JUDGE", "true").lower() != "true":
+            return True
+        llm = self.llm
+        if llm is None:
+            return True
+        text = (getattr(rule, "rule_text", "") or getattr(rule, "description", "") or "")[:400]
+        snippet = (getattr(rule, "source_snippet", "") or "")[:300]
+        prompt = (
+            "Tu valides la QUALITÉ d'une règle de conformité AML/KYC extraite d'un "
+            "texte réglementaire. Est-ce une VRAIE OBLIGATION (un sujet DOIT ou NE "
+            "DOIT PAS faire une action — modalité déontique), ou seulement du texte "
+            "DESCRIPTIF, une définition ou du contexte ?\n"
+            f"RÈGLE : {text}\n"
+            f"EXTRAIT SOURCE : {snippet}\n\n"
+            'Réponds en JSON strict : {"is_rule": true, "raison": "…"}')
+        try:
+            resp = llm.chat.completions.create(
+                model=None, messages=[{"role": "user", "content": prompt}],
+                temperature=0.0, max_tokens=120)
+            raw = re.sub(r"```json\s*|```", "",
+                         (resp.choices[0].message.content or "").strip())
+            m = re.search(r"\{.*\}", raw, re.DOTALL)
+            if m:
+                return bool(json.loads(m.group(0)).get("is_rule", True))
+        except Exception as e:
+            logger.debug(f"Juge de qualité indisponible : {e}")
+        return True   # repli : ne pas bloquer une règle déjà ancrée verbatim
+
     def _persist_validated(self, rules: list, tx_type: str):
         """
         [R5] Persistance automatique dans Neo4j.
-        Seulement les règles conf ≥ 0.65 ET snippet validé (anti-hallucination).
+        Seulement les règles conf ≥ 0.65 ET snippet validé (anti-hallucination)
+        ET jugées « vraie obligation » par le juge de qualité (étape 2).
         """
         if not self.driver:
             return
@@ -1110,6 +1158,10 @@ class SemanticReasoner:
             # Le matching trigrammes (0.6) suffit pour utiliser la règle
             # dans CETTE analyse, mais pas pour polluer le graphe durable.
             if not r.snippet_verbatim:
+                continue
+            # [Étape 2] Juge de qualité : vraie obligation, pas du descriptif ?
+            if not self._rule_quality_ok(r):
+                self.rejected_low_quality = getattr(self, "rejected_low_quality", 0) + 1
                 continue
             try:
                 with self.driver.session() as s:

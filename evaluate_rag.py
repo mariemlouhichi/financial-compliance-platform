@@ -84,7 +84,7 @@ GOLDEN = [
      "expected_docs": ["fatf", "loi_2015_26"], "in_scope": True},
 
     {"id": "SUSPICIOUS_INDICATORS",
-     "query": "red flag indicators of money laundering transaction without economic justification reporting",
+     "query": "obligation to file a suspicious transaction report when an operation has no lawful economic justification",
      "tx_type": "VIREMENT_LOCAL", "jurisdiction": "Tunisia",
      "expected_docs": ["fatf", "ctaf"], "in_scope": True},
 
@@ -104,14 +104,39 @@ GOLDEN = [
      "expected_docs": ["fatf"], "in_scope": True},
 
     {"id": "STR_DEADLINE_CTAF",
-     "query": "deadline and authority to file a suspicious transaction report CTAF",
+     "query": "obligation to declare suspicious operations to the CTAF financial intelligence unit",
      "tx_type": "VIREMENT_LOCAL", "jurisdiction": "Tunisia",
      "expected_docs": ["loi_2015_26", "ctaf", "bct_circulaire_2017_08"], "in_scope": True},
 
     {"id": "RISK_BASED_APPROACH",
-     "query": "risk based approach obligation to assess and classify customer money laundering risk",
+     "query": "obligation to classify each customer by money laundering risk level and apply proportionate due diligence",
      "tx_type": "VIREMENT_LOCAL", "jurisdiction": "Tunisia",
      "expected_docs": ["bct_circulaire_2017_08", "loi_2015_26", "fatf"], "in_scope": True},
+
+    {"id": "CASH_DEPOSIT_REPORTING",
+     "query": "reporting and record keeping obligations for a cash deposit above the regulatory threshold",
+     "tx_type": "DEPOT_ESPECES", "jurisdiction": "Tunisia",
+     "expected_docs": ["bct_circulaire", "ctaf", "loi_2015_26"], "in_scope": True},
+
+    {"id": "HIGH_RISK_COUNTRY",
+     "query": "enhanced due diligence measures for transactions involving high risk jurisdictions",
+     "tx_type": "SWIFT", "jurisdiction": "International",
+     "expected_docs": ["fatf", "ctaf"], "in_scope": True},
+
+    {"id": "TIPPING_OFF",
+     "query": "prohibition to inform a customer that a suspicious transaction declaration has been filed against them",
+     "tx_type": "VIREMENT_LOCAL", "jurisdiction": "Tunisia",
+     "expected_docs": ["loi_2015_26"], "in_scope": True},
+
+    {"id": "ASSET_FREEZE",
+     "query": "obligation to freeze without delay the assets of designated persons under sanctions",
+     "tx_type": "SWIFT", "jurisdiction": "International",
+     "expected_docs": ["fatf", "loi_2015_26"], "in_scope": True},
+
+    {"id": "SHELL_BANK",
+     "query": "prohibition of correspondent banking relationships with shell banks",
+     "tx_type": "SWIFT", "jurisdiction": "International",
+     "expected_docs": ["basel", "fatf"], "in_scope": True},
 
     # ── HORS-CHAMP : le système DOIT s'abstenir (aucune source AML pertinente) ──
     {"id": "OOS_VAT",
@@ -124,6 +149,18 @@ GOLDEN = [
 
     {"id": "OOS_WEATHER",
      "query": "weather forecast temperature in Tunis next weekend",
+     "tx_type": None, "jurisdiction": None, "expected_docs": [], "in_scope": False},
+
+    {"id": "OOS_SPORT",
+     "query": "which national team won the football world cup in 2022",
+     "tx_type": None, "jurisdiction": None, "expected_docs": [], "in_scope": False},
+
+    {"id": "OOS_MATH",
+     "query": "how do you solve a quadratic equation using the discriminant formula",
+     "tx_type": None, "jurisdiction": None, "expected_docs": [], "in_scope": False},
+
+    {"id": "OOS_TRAVEL",
+     "query": "cheapest way to book a flight from Tunis to Paris in summer",
      "tx_type": None, "jurisdiction": None, "expected_docs": [], "in_scope": False},
 ]
 

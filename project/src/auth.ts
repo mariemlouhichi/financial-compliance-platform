@@ -6,7 +6,7 @@
 // Le contrôle d'accès réel doit TOUJOURS être ré-appliqué côté API.
 // ============================================================================
 
-export type Role = 'USER' | 'ADMIN' | 'COMPLIANCE_OFFICER' | 'AUDITOR';
+export type Role = 'USER' | 'ADMIN' | 'COMPLIANCE_OFFICER';
 
 export interface Session {
   token: string;
@@ -21,7 +21,6 @@ export const ROLE_LABELS: Record<Role, string> = {
   USER: 'Utilisateur',
   ADMIN: 'Administrateur',
   COMPLIANCE_OFFICER: 'Compliance Officer',
-  AUDITOR: 'Auditeur',
 };
 
 // ── Matrice des espaces (SÉPARATION DES DEVOIRS) ─────────────────────────
@@ -31,8 +30,6 @@ export const ROLE_LABELS: Record<Role, string> = {
 //   (approuver/refuser) — garde équivalente côté API (/api/validate).
 // ADMIN (technique DSI) : pilotage plateforme (simulateur, dataset, monitoring)
 //   + lecture conformité, mais NE PEUT PAS valider un dossier réglementaire.
-// AUDITOR : espace d'INVESTIGATION dédié (page audit : recherche transversale,
-//   piste d'audit des décisions, statistiques de qualité) + lecture seule.
 export const ROLE_PAGES: Record<Role, string[]> = {
   USER:               ['submit', 'myfiles', 'profile', 'pipeline'],
   COMPLIANCE_OFFICER: ['', 'supervisor', 'reports', 'rules', 'graph',
@@ -40,8 +37,6 @@ export const ROLE_PAGES: Record<Role, string[]> = {
   ADMIN:              ['', 'submit', 'myfiles', 'profile',
                        'reports', 'rules', 'graph', 'regulations',
                        'simulator', 'pipeline'],
-  AUDITOR:            ['', 'audit', 'reports', 'rules', 'graph', 'regulations',
-                       'pipeline'],
 };
 
 /** Page d'accueil selon le rôle (l'agent bancaire n'a pas le dashboard admin). */

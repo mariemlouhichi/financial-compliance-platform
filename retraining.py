@@ -179,41 +179,33 @@ def decide(stats: dict, force: bool = False) -> dict:
 #  4. RÉENTRAÎNEMENT + GARDE-FOU
 # ═══════════════════════════════════════════════════════════════════════
 
-def retrain(stats: dict) -> dict:
-    """Lance le réentraînement si le jeu d'entraînement est disponible.
+def retrain(stats: dict, force: bool = False) -> dict:
+    """Réentraînement INCRÉMENTAL (warm-start) à partir du feedback, avec garde-fou.
 
-    GARDE-FOU : un nouveau modèle n'est déployé que s'il améliore les
-    métriques. En cas de dégradation, le modèle courant est conservé et une
-    alerte est journalisée — la boucle ne peut pas se dégrader toute seule.
+    Délègue à rlhf.incremental_retrain : on repart du modèle existant, on ajoute
+    quelques itérations de boosting sur feedback + replay buffer, et on ne
+    DÉPLOIE que si F1 et PR-AUC ne régressent pas (sinon rollback). Le
+    réentraînement COMPLET (train_demo_ml.py, 600k + LSTM) reste le chemin lourd.
     """
-    trainer = BASE / "train_demo_ml.py"
-    dataset = BASE / "aml_ml_demo_sample.csv"
-
-    if not trainer.exists() or not dataset.exists():
+    model_file = BASE / "aml_ml_demo_lgb.txt"
+    sample_file = BASE / "aml_ml_demo_sample.csv"
+    if not model_file.exists() or not sample_file.exists():
         return {
             "status": "IGNORÉ",
-            "detail": ("jeu d'entraînement indisponible dans cet environnement "
-                       "(train_demo_ml.py ou aml_ml_demo_sample.csv absent). "
+            "detail": ("modèle ou échantillon de base absent "
+                       "(aml_ml_demo_lgb.txt / aml_ml_demo_sample.csv). "
                        "Le feedback reste accumulé pour le prochain cycle."),
             "deployed": False,
         }
-
-    meta_file = BASE / "aml_ml_demo_meta.json"
-    before = {}
-    if meta_file.exists():
-        try:
-            before = json.loads(meta_file.read_text(encoding="utf-8")).get("metrics", {})
-        except Exception:
-            before = {}
-
-    return {
-        "status": "PRÊT",
-        "detail": ("réentraînement exécutable — à lancer explicitement via "
-                   "`python train_demo_ml.py`, puis comparer les métriques "
-                   "avant déploiement."),
-        "metrics_before": {k: before.get(k) for k in ("pr_auc", "f1", "precision", "recall")},
-        "deployed": False,
-    }
+    try:
+        from rlhf import incremental_retrain
+        rep = incremental_retrain(force=force)
+        rep["status"] = rep.get("status", "?")
+        rep.setdefault("detail", rep.get("reason", ""))
+        return rep
+    except Exception as e:
+        return {"status": "ERREUR", "detail": f"warm-start indisponible : {e}",
+                "deployed": False}
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -249,7 +241,7 @@ def run_cycle(force: bool = False) -> dict:
     stats["new_since_last_cycle"] = len(new_events)
 
     verdict = decide(stats, force=force)
-    training = retrain(stats) if verdict["retrain"] else {
+    training = retrain(stats, force=force) if verdict["retrain"] else {
         "status": "NON DÉCLENCHÉ", "detail": verdict["reason"], "deployed": False}
 
     report = {

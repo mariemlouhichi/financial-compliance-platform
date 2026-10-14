@@ -66,7 +66,6 @@ COMPTES = [
     # ── Superviseur (Compliance Officer) ──
     ("COMPLIANCE_OFFICER", "compliance@demo.local",    "Officer@2026", "Responsable Conformité",    None),
     # ── Auditeur ──
-    ("AUDITOR",            "user@demo.local", "Auditor@2026", "Auditeur Interne",          None),
     # ── Agents (clients) — le 1er a un profil KYC complet ──
     ("USER",               AGENT_EMAIL,                "Agent@2026",   "Agent Bancaire",            PROFIL_AGENT),
     ("USER",               "agent2@demo.local", "Agent@2026", "Agent Bancaire 2",          None),

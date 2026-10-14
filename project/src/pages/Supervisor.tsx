@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { CheckCircle2, XCircle, MessageSquarePlus, ShieldCheck, Clock } from 'lucide-react';
-import { api, subscribeEvents } from '../api/client';
+import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, XCircle, MessageSquarePlus, ShieldCheck, Clock,
+         Play, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
+import { api, subscribeEvents, type RlhfSummary, type RlhfCycleReport } from '../api/client';
 import type { TxListItem, QueueItem, JobResult } from '../types/api';
 import type { Session } from '../auth';
 import { PageHeader } from '../components/Layout';
@@ -37,6 +38,7 @@ export function SupervisorPage({ session }: { session: Session }) {
   const [labelTag, setLabelTag] = useState('CORRECT');
   const [sending, setSending] = useState(false);
   const [flash, setFlash] = useState('');
+  const [period, setPeriod] = useState('');   // '' | day | week | month
 
   const load = async () => {
     setLoading(true);
@@ -85,22 +87,22 @@ export function SupervisorPage({ session }: { session: Session }) {
     }
   };
 
+  // Filtre par periode + tri du plus RECENT au plus ancien : un dossier
+  // qui vient d'etre soumis doit apparaitre en tete de file.
+  const shownPending = useMemo(() => {
+    const day = 86_400_000;
+    const horizon = period === 'day' ? day : period === 'week' ? 7 * day
+      : period === 'month' ? 30 * day : Infinity;
+    return pending
+      .filter(t => Date.now() - new Date(t.created_at).getTime() <= horizon)
+      .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  }, [pending, period]);
+
   return (
     <>
       <PageHeader
         title="File superviseur"
-        subtitle="Transactions « en cours » (REVIEW / EDD / STR) en attente de décision humaine"
       />
-
-      {/* Séparation des devoirs (SoD) — rendue VISIBLE : seul ce rôle valide. */}
-      <div className="mb-4 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800">
-        <ShieldCheck size={15} className="shrink-0" />
-        <span>
-          <b>Séparation des devoirs</b> — la validation d'un dossier réglementaire
-          est réservée au <b>Compliance Officer</b>. Un administrateur technique ne
-          peut jamais approuver ou refuser (contrôlé aussi côté API : 403).
-        </span>
-      </div>
 
       {flash && (
         <p className="mb-4 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm">
@@ -111,13 +113,21 @@ export function SupervisorPage({ session }: { session: Session }) {
       <div className="grid gap-6 lg:grid-cols-5">
         {/* ── Liste ──────────────────────────────────────────────────── */}
         <div className="lg:col-span-2">
-          <Card title={`En attente (${pending.length})`}
-                subtitle="Triée par urgence : priorité (STR/BLOCK ▸ HAUTE) puis ancienneté">
-            {loading ? <Spinner /> : pending.length === 0 ? (
+          <Card title={`En attente (${shownPending.length}${
+                  shownPending.length !== pending.length ? ` / ${pending.length}` : ''})`}
+                actions={
+                  <select value={period} onChange={e => setPeriod(e.target.value)}
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600 focus:border-indigo-400 focus:outline-none">
+                    <option value="">Toute la période</option>
+                    <option value="day">Aujourd'hui</option>
+                    <option value="week">7 derniers jours</option>
+                    <option value="month">30 derniers jours</option>
+                  </select>}>
+            {loading ? <Spinner /> : shownPending.length === 0 ? (
               <EmptyState>Aucune transaction en attente — la file est vide. ✅</EmptyState>
             ) : (
               <ul className="space-y-2">
-                {pending.map(t => (
+                {shownPending.map(t => (
                   <li key={t.tx_id}>
                     <button onClick={() => open(t.tx_id)}
                       className={`w-full rounded-lg border px-3 py-2.5 text-left transition-colors ${
@@ -256,8 +266,7 @@ export function SupervisorPage({ session }: { session: Session }) {
       {/* ── Historique des décisions superviseur ───────────────────────── */}
       <div className="mt-6">
         <Card
-          title={<><Clock size={15} className="mr-1.5 inline text-slate-400" />Historique des décisions</>}
-          subtitle="Décisions passées — traçabilité complète (qui, quoi, quand, pourquoi)">
+          title={<><Clock size={15} className="mr-1.5 inline text-slate-400" />Historique des décisions</>}>
           {history.length === 0 ? (
             <EmptyState>Aucune décision enregistrée pour l'instant.</EmptyState>
           ) : (
@@ -295,6 +304,150 @@ export function SupervisorPage({ session }: { session: Session }) {
           )}
         </Card>
       </div>
+
+      {/* ── Amélioration continue (RLHF) ────────────────────────────────── */}
+      <div className="mt-6">
+        <RlhfPanel />
+      </div>
     </>
+  );
+}
+
+// ── Panneau RLHF : boucle d'amélioration continue à partir du feedback ───
+//  Montre l'accord système/expert + le taux de fausses alertes, et permet de
+//  LANCER un cycle (warm-start garde-fou) et d'en voir le verdict avant/après.
+const fmtPct = (v?: number) => (v == null ? '—' : `${(v * 100).toFixed(1)} %`);
+
+function RlhfPanel() {
+  const [sum, setSum] = useState<RlhfSummary | null>(null);
+  const [report, setReport] = useState<RlhfCycleReport | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  const load = () => api.rlhfSummary().then(setSum).catch(e => setErr(String(e)));
+  useEffect(() => { load(); }, []);
+
+  const run = async (force: boolean) => {
+    setErr(''); setBusy(true); setReport(null);
+    try {
+      const r = await api.rlhfRun(force);
+      setReport(r);
+      await load();   // rafraîchit les métriques du modèle
+    } catch (e) {
+      setErr(String(e instanceof Error ? e.message : e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const s = sum?.stats;
+  const t = report?.training;
+  const before = t?.metrics_before, after = t?.metrics_after;
+
+  return (
+    <Card
+      title={<><ShieldCheck size={15} className="mr-1.5 inline text-slate-400" />Amélioration continue (RLHF)</>}>
+      {/* Stats de feedback */}
+      <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <KV k="Étiquettes" v={<b>{s?.labelled ?? '—'}</b>} />
+        <KV k="Accord système/expert" v={fmtPct(s?.agreement_rate)} />
+        <KV k="Taux de fausses alertes"
+          v={<span className={s && s.false_positive_rate > (sum?.thresholds.fp_alert ?? 0.3) ? 'font-bold text-red-600' : ''}>
+            {fmtPct(s?.false_positive_rate)}</span>} />
+        <KV k="Seuil modèle actuel"
+          v={sum?.model.threshold != null ? sum.model.threshold.toFixed(4) : '—'} />
+      </div>
+
+      <p className="mb-3 text-[11px] text-slate-500">
+        🛡️ Garde-fous : volume minimum <b>{sum?.thresholds.min_labels ?? 20}</b> étiquettes ·
+        déploiement <b>seulement si F1 et PR-AUC ne régressent pas</b> · trace auditable dans{' '}
+        <code className="rounded bg-slate-100 px-1">output/retraining/</code>.
+        {sum?.model.last_rlhf && (
+          <span className="ml-1 text-emerald-600">
+            Dernier warm-start : {sum.model.last_rlhf.feedback_used} feedback(s).
+          </span>
+        )}
+      </p>
+
+      {/* Actions */}
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => run(false)} disabled={busy}
+          className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-40">
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
+          Lancer un cycle RLHF
+        </button>
+        <button onClick={() => run(true)} disabled={busy}
+          className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+          title="Ignore le seuil de volume — pour la démonstration">
+          Forcer (démo)
+        </button>
+      </div>
+
+      {err && <p className="mt-2 text-xs text-red-600">{err}</p>}
+
+      {/* Rapport du cycle */}
+      {report && (
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <span className={`rounded px-2 py-0.5 text-[11px] font-bold ${
+              t?.deployed ? 'bg-emerald-100 text-emerald-800'
+              : t?.status === 'VOLUME_INSUFFISANT' ? 'bg-amber-100 text-amber-800'
+              : 'bg-slate-200 text-slate-700'}`}>
+              {t?.deployed ? '✓ MODÈLE DÉPLOYÉ' : `⟲ ${t?.status ?? 'NON DÉPLOYÉ'}`}
+            </span>
+            {t?.duration_s != null && (
+              <span className="text-[11px] text-slate-400">en {t.duration_s}s</span>
+            )}
+          </div>
+          <p className="mb-2 text-xs text-slate-600">{t?.reason ?? t?.detail ?? report.decision.reason}</p>
+
+          {before && after && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-[10px] uppercase tracking-wide text-slate-400">
+                    <th className="pb-1 pr-4">Métrique</th>
+                    <th className="pb-1 pr-4">Avant</th>
+                    <th className="pb-1 pr-4">Après</th>
+                    <th className="pb-1">Δ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(['pr_auc', 'f1', 'precision', 'recall', 'threshold'] as const).map(k => {
+                    const b = before[k], a = after[k];
+                    const delta = (a != null && b != null) ? a - b : null;
+                    return (
+                      <tr key={k} className="border-t border-slate-100">
+                        <td className="py-1 pr-4 font-medium text-slate-600">{k}</td>
+                        <td className="py-1 pr-4 tabular-nums text-slate-500">{b?.toFixed(4) ?? '—'}</td>
+                        <td className="py-1 pr-4 tabular-nums font-semibold text-slate-800">{a?.toFixed(4) ?? '—'}</td>
+                        <td className="py-1 tabular-nums">
+                          {delta == null ? '—' : (
+                            <span className={`inline-flex items-center gap-0.5 ${
+                              delta > 0 ? 'text-emerald-600' : delta < 0 ? 'text-red-600' : 'text-slate-400'}`}>
+                              {delta > 0 ? <TrendingUp size={11} /> : delta < 0 ? <TrendingDown size={11} /> : null}
+                              {delta > 0 ? '+' : ''}{delta.toFixed(4)}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {t?.feedback && (
+            <p className="mt-2 text-[11px] text-slate-500">
+              Dataset feedback : {t.feedback.usable} exemple(s)
+              ({t.feedback.positives} fraude / {t.feedback.negatives} normal)
+              {t.feedback.missing_features > 0 &&
+                ` · ${t.feedback.missing_features} feedback(s) sans features (transactions antérieures)`}
+            </p>
+          )}
+        </div>
+      )}
+    </Card>
   );
 }

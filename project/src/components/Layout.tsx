@@ -5,8 +5,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   LayoutDashboard, Send, Workflow, ScanEye, FileText,
-  PlayCircle, Shield, LogOut, FolderOpen,
-  BookMarked, GitFork, Library, UserCircle, SearchCheck,
+  PlayCircle, LogOut, FolderOpen,
+  BookMarked, GitFork, Library, UserCircle,
   Sun, Moon,
 } from 'lucide-react';
 import { Link, useRoute } from '../router';
@@ -15,8 +15,7 @@ import { api } from '../api/client';
 import { getTheme, toggleTheme, type Theme } from '../theme';
 
 // Chaque section ne s'affiche que si le rôle a accès à ≥1 de ses pages
-// (ROLE_PAGES filtre) — l'auditeur voit donc « Conformité & connaissance »
-// en lecture seule sans la file superviseur, l'agent n'y voit que le corpus.
+// (ROLE_PAGES filtre) — l'agent bancaire n'y voit que son propre espace.
 const NAV_SECTIONS = [
   {
     label: 'Espace utilisateur',
@@ -41,12 +40,6 @@ const NAV_SECTIONS = [
     items: [
       { page: '',          label: 'Dashboard',       Icon: LayoutDashboard },
       { page: 'simulator', label: 'Flux en direct',  Icon: PlayCircle },
-    ],
-  },
-  {
-    label: 'Espace audit',
-    items: [
-      { page: 'audit', label: 'Investigation', Icon: SearchCheck },
     ],
   },
   {
@@ -122,13 +115,15 @@ export function Layout({ session, onLogout, children }: {
       {/* ── Sidebar ─────────────────────────────────────────────────── */}
       <aside className="fixed inset-y-0 left-0 z-20 flex w-64 flex-col bg-[#152c4d] text-slate-300">
         <div className="flex items-center gap-2.5 border-b border-white/10 bg-[#0f1f36] px-5 py-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-400/30">
-            <Shield size={20} className="text-emerald-400" strokeWidth={2.2} />
+          {/* Logo LexIQ — le fichier est un texte bleu marine sur fond blanc :
+              on le pose sur une pastille claire pour qu'il reste lisible sur la
+              barre latérale sombre. */}
+          <span className="flex items-center justify-center rounded-lg bg-white px-2.5 py-1.5">
+            <img src="/lexiq-logo.png" alt="LexIQ" className="h-5 w-auto" />
           </span>
-          <div>
-            <p className="text-sm font-bold leading-tight text-white">Financial Compliance</p>
-            <p className="text-[10px] uppercase tracking-wider text-slate-500">
-              Surveillance Multi-Agent
+          <div className="min-w-0">
+            <p className="text-xs font-semibold leading-snug text-white">
+              Financial Compliance Platform
             </p>
           </div>
         </div>
@@ -210,6 +205,13 @@ export function Layout({ session, onLogout, children }: {
           >
             <LogOut size={13} /> Se déconnecter
           </button>
+        </div>
+
+        {/* Mention du partenaire industriel — discrète, toujours visible. */}
+        <div className="border-t border-white/10 px-4 py-2 text-center">
+          <p className="text-[10px] font-semibold leading-tight tracking-wider text-slate-500">
+            VERMEG
+          </p>
         </div>
       </aside>
 

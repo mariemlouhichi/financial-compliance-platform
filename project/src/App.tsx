@@ -21,7 +21,6 @@ import { DatasetPage } from './pages/Dataset';
 import { RulesPage } from './pages/Rules';
 import { GraphPage } from './pages/Graph';
 import { ProfilePage } from './pages/Profile';
-import { AuditPage } from './pages/Audit';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(getSession());
@@ -55,7 +54,6 @@ export default function App() {
       case 'myfiles':     content = <MyFilesPage session={session} />; break;
       case 'profile':     content = <ProfilePage session={session} />; break;
       case 'pipeline':    content = <PipelineLivePage txId={route.param} session={session} />; break;
-      case 'audit':       content = <AuditPage />; break;
       case 'supervisor':  content = <SupervisorPage session={session} />; break;
       case 'reports':     content = <ReportsPage />; break;
       case 'rules':       content = <RulesPage />; break;

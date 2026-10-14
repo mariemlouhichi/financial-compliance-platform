@@ -242,17 +242,27 @@ def init_components():
 # ═══════════════════════════════════════════════════════════════════════
 
 def _rule_to_dict(r) -> dict:
+    _thr = getattr(r, "threshold", None)
     return {
         "rule_text": (getattr(r, "rule_text", "") or "")[:250],
         "source_doc": getattr(r, "source_doc", ""),
         "rule_ref": getattr(r, "rule_ref", ""),
         "fatf_rec": getattr(r, "fatf_rec", ""),
         "severity": getattr(r, "severity", ""),
+        "category": getattr(r, "category", ""),
         "provenance": getattr(r, "provenance", ""),
+        "rule_status": getattr(r, "rule_status", ""),
         "violated": bool(getattr(r, "violated", False)),
+        "mitigated": bool(getattr(r, "mitigated", False)),
         "confidence": round(float(getattr(r, "confidence", 0) or 0), 3),
         "cross_validated": bool(getattr(r, "cross_validated", False)),
         "cross_source_validated": bool(getattr(r, "cross_source_validated", False)),
+        # [Front] citation VERBATIM du texte de loi — preuve anti-hallucination.
+        # Uniquement si ancrée mot-à-mot (snippet_verbatim), sinon chaîne vide.
+        "source_snippet": ((getattr(r, "source_snippet", "") or "")[:220]
+                           if getattr(r, "snippet_verbatim", False) else ""),
+        "threshold": (float(_thr) if isinstance(_thr, (int, float)) else None),
+        "threshold_unit": getattr(r, "threshold_unit", ""),
     }
 
 
@@ -612,6 +622,11 @@ def execute_pipeline(tx: dict, tx_id: str):
             "symbolic_rules": int(dstats.get("symbolic_rules", 0)),
             "semantic_rules": int(dstats.get("semantic_rules", 0)),
             "rules_persisted": int(dstats.get("rules_persisted", 0)),
+            # [Diagnostic + jury] gate anti-hallucination : nb de règles
+            # extraites par le LLM PUIS rejetées faute d'ancrage verbatim,
+            # et nb de dimensions FATF confiées au chemin sémantique.
+            "semantic_rejected": int(dstats.get("semantic_rejected", 0)),
+            "gap_dims": int(dstats.get("gap_dims", 0)),
         })
 
         # ── [6] ML (signal indicatif — divergence gérée par le SAR) ──
@@ -619,6 +634,10 @@ def execute_pipeline(tx: dict, tx_id: str):
         ml_result = C["ml"].predict(tx, client_id=client_id)
         ml_public = {k: v for k, v in ml_result.items() if k != "all_features"}
         done("ml", t0, ml_public)
+        # [RLHF] Persiste le vecteur de features ML (hors réponse publique) —
+        # permet de transformer le feedback superviseur en exemples étiquetés
+        # (rlhf.build_feedback_dataset). Aligné sur meta["features"].
+        job["ml_features"] = ml_result.get("all_features", {})
 
         # ── [7] SAR ───────────────────────────────────────────────────
         t0 = time.time()
@@ -846,7 +865,7 @@ def _startup():
 def scheduler_status(authorization: Optional[str] = Header(None)):
     """État du planificateur : tâches, dernières exécutions, historique."""
     user = current_user(authorization)
-    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN", "AUDITOR"):
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
         raise HTTPException(403, "Accès réservé à la conformité et à l'audit.")
     return SCHEDULER.status()
 
@@ -858,6 +877,43 @@ def scheduler_run(job_name: str, authorization: Optional[str] = Header(None)):
     if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
         raise HTTPException(403, "Accès réservé à la conformité.")
     return SCHEDULER.run_job(job_name, manual=True)
+
+
+# ── RLHF — boucle d'amélioration continue (feedback superviseur) ─────────
+@app.get("/api/rlhf/summary")
+def rlhf_summary(authorization: Optional[str] = Header(None)):
+    """État de la boucle RLHF : accord système/expert, taux de fausses alertes,
+    métriques du modèle courant, dernier cycle."""
+    user = current_user(authorization)
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
+        raise HTTPException(403, "Accès réservé à la conformité et à l'audit.")
+    from retraining import (load_feedback, enrich_with_transactions, measure,
+                            load_state, MIN_LABELS, FP_ALERT)
+    stats = measure(enrich_with_transactions(load_feedback()))
+    meta = {}
+    try:
+        meta = json.loads((BASE / "aml_ml_demo_meta.json").read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {
+        "stats": stats,
+        "model": {"threshold": meta.get("threshold"),
+                  "metrics": meta.get("metrics", {}),
+                  "last_rlhf": meta.get("last_rlhf")},
+        "thresholds": {"min_labels": MIN_LABELS, "fp_alert": FP_ALERT},
+        "last_cycle": load_state(),
+    }
+
+
+@app.post("/api/rlhf/run")
+def rlhf_run(force: bool = False, authorization: Optional[str] = Header(None)):
+    """Lance un cycle RLHF complet (agrégation → décision → warm-start garde-fou
+    → trace). `force=true` bypasse le seuil de volume pour la démonstration."""
+    user = current_user(authorization)
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
+        raise HTTPException(403, "Accès réservé à la conformité.")
+    from retraining import run_cycle
+    return run_cycle(force=force)
 
 
 @app.get("/api/health")
@@ -901,7 +957,8 @@ def result(tx_id: str):
     job = JOBS.get(tx_id)
     if not job:
         raise HTTPException(404, f"Transaction {tx_id} inconnue")
-    return {k: v for k, v in job.items() if k not in ("sar_markdown", "_files")}
+    return {k: v for k, v in job.items()
+            if k not in ("sar_markdown", "_files", "ml_features")}
 
 
 @app.get("/api/sar/{tx_id}/markdown", response_class=PlainTextResponse)
@@ -964,7 +1021,7 @@ def transactions_query(
     Réservé à l'audit / la conformité (séparation des devoirs).
     """
     user = current_user(authorization)
-    if not user or user["r"] not in ("AUDITOR", "COMPLIANCE_OFFICER", "ADMIN"):
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
         raise HTTPException(403, "Accès réservé à l'audit et à la conformité.")
     # date_to au format jour seul (YYYY-MM-DD) → inclure toute la journée
     if date_to and len(date_to) == 10:
@@ -1072,7 +1129,7 @@ def supervisor_queue(authorization: Optional[str] = Header(None)):
     """File d'attente enrichie : priorité (HAUTE/MOYENNE/NORMALE) + ancienneté,
     triée par urgence. Réservée à la conformité / l'audit."""
     user = current_user(authorization)
-    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN", "AUDITOR"):
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
         raise HTTPException(403, "Accès réservé à la conformité et à l'audit.")
     items = []
     for job in JOBS.values():
@@ -1098,7 +1155,7 @@ def supervisor_history(limit: int = 100,
                        authorization: Optional[str] = Header(None)):
     """Historique des décisions superviseur passées (plus récentes d'abord)."""
     user = current_user(authorization)
-    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN", "AUDITOR"):
+    if not user or user["r"] not in ("COMPLIANCE_OFFICER", "ADMIN"):
         raise HTTPException(403, "Accès réservé à la conformité et à l'audit.")
     out = [_tx_item(job) for job in JOBS.values()
            if job.get("supervisor_decision")]
@@ -1605,6 +1662,86 @@ def regulations_search(q: str, top_k: int = 5):
         return {"query": q, "results": [_chunk_to_dict(c) for c in chunks]}
     except Exception as e:
         raise HTTPException(500, f"Recherche indisponible : {e}")
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  UPLOAD DE RÈGLEMENTS — ingestion à la demande (extraction → traduction →
+#  chunking → embeddings → Weaviate). Le document devient interrogeable par
+#  le RAG. Traité en arrière-plan (thread), le front sonde le statut.
+# ═══════════════════════════════════════════════════════════════════════
+REG_JOBS: dict[str, dict] = {}
+_reg_counter = {"n": 0}
+
+
+class RegulationUploadIn(BaseModel):
+    filename:     str
+    content_b64:  str = Field(..., description="PDF encodé base64")
+    jurisdiction: str = "international"   # "tunisia" | "international"
+    translate:    bool = True            # traduire FR→EN (corpus en anglais)
+
+
+def _run_ingest(job_id: str, tmp_path: str, jurisdiction: str,
+                doc_name: str, translate: bool):
+    job = REG_JOBS[job_id]
+
+    def progress(stage: str, detail: str = ""):
+        job["stage"], job["detail"] = stage, detail
+
+    try:
+        from ingest_document import ingest_pdf
+        result = ingest_pdf(tmp_path, jurisdiction=jurisdiction,
+                            doc_name=doc_name, translate=translate,
+                            progress=progress)
+        job.update(status="DONE", stage="done", result=result)
+    except Exception as e:
+        job.update(status="ERROR", stage="error", error=str(e)[:300])
+    finally:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
+
+
+@app.post("/api/regulations/upload")
+def regulations_upload(body: RegulationUploadIn,
+                       authorization: Optional[str] = Header(None)):
+    """Reçoit un PDF réglementaire (base64), lance l'ingestion en tâche de
+    fond, renvoie un job_id à sonder via GET /api/regulations/upload/{id}."""
+    import base64, tempfile
+    if not body.filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "Seuls les fichiers PDF sont acceptés")
+    try:
+        data = base64.b64decode(body.content_b64.split(",")[-1])
+    except Exception:
+        raise HTTPException(400, "Contenu base64 invalide")
+    if len(data) > 40 * 1024 * 1024:
+        raise HTTPException(413, "PDF trop volumineux (max 40 Mo)")
+
+    fd = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    fd.write(data)
+    fd.close()
+
+    _reg_counter["n"] += 1
+    job_id = f"REG-{datetime.now():%Y%m%d}-{_reg_counter['n']:04d}"
+    jur = body.jurisdiction if body.jurisdiction in ("tunisia", "international") \
+        else "international"
+    REG_JOBS[job_id] = {
+        "job_id": job_id, "status": "RUNNING", "stage": "queued", "detail": "",
+        "doc_name": body.filename, "jurisdiction": jur,
+        "created_at": datetime.now().isoformat(),
+    }
+    threading.Thread(target=_run_ingest,
+                     args=(job_id, fd.name, jur, body.filename, body.translate),
+                     daemon=True).start()
+    return {"job_id": job_id, "status": "RUNNING"}
+
+
+@app.get("/api/regulations/upload/{job_id}")
+def regulations_upload_status(job_id: str):
+    job = REG_JOBS.get(job_id)
+    if not job:
+        raise HTTPException(404, "Job d'ingestion inconnu")
+    return job
 
 
 # ═══════════════════════════════════════════════════════════════════════

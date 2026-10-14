@@ -14,7 +14,7 @@ Keycloak (OAuth2/SSO) = PERSPECTIVE documentée — cette couche expose la même
 interface (register/login/roles) et serait remplaçable sans toucher au front.
 
 RÔLES : USER (agent bancaire, espace utilisateur) · ADMIN ·
-        COMPLIANCE_OFFICER · AUDITOR (espace admin).
+        COMPLIANCE_OFFICER (espace admin).
 """
 
 import base64
@@ -37,7 +37,7 @@ BASE = Path(__file__).resolve().parent.parent
 DB_PATH = BASE / "platform.db"
 SECRET_PATH = BASE / "output" / "api_secret.key"
 
-ROLES = {"USER", "ADMIN", "COMPLIANCE_OFFICER", "AUDITOR"}
+ROLES = {"USER", "ADMIN", "COMPLIANCE_OFFICER"}
 TOKEN_TTL = 12 * 3600  # 12h
 
 _db_lock = threading.Lock()
@@ -468,7 +468,7 @@ class RegisterIn(BaseModel):
     email: str = Field(..., min_length=5)
     password: str = Field(..., min_length=6)
     full_name: str = Field("", max_length=80)
-    role: str = Field("USER", description="USER | ADMIN | COMPLIANCE_OFFICER | AUDITOR")
+    role: str = Field("USER", description="USER | ADMIN | COMPLIANCE_OFFICER")
 
 
 class VerifyIn(BaseModel):

@@ -5,6 +5,47 @@
 
 ---
 
+## ⚠️ À FAIRE EN PREMIER si tu recrées le déploiement
+
+Le déploiement a été **supprimé volontairement** après validation, pour préserver
+le crédit Azure for Students jusqu'à la soutenance. L'ancienne URL ne répond donc
+plus (`DNS_PROBE_FINISHED_NXDOMAIN`) : c'est normal.
+
+**Le piège au redéploiement.** Le fichier `.github/workflows/deploy-web.yml`
+contient, ligne 33 :
+
+```yaml
+API_URL: https://aml-api.mangoisland-00189a40.francecentral.azurecontainerapps.io
+```
+
+`mangoisland-00189a40` est le suffixe **généré aléatoirement par Azure** à la
+création de l'environnement Container Apps. En recréant l'environnement, ce
+suffixe sera **différent**.
+
+Cette adresse est figée dans le bundle React au moment du build. Si elle n'est pas
+mise à jour :
+
+- l'interface s'affiche normalement, page de connexion comprise ;
+- **tous les appels échouent** — connexion, analyse, validation ;
+- **aucun message d'erreur explicite** n'indique la cause.
+
+**Ordre à respecter :**
+
+1. Créer l'environnement Azure et déployer `aml-api`.
+2. Relever le FQDN réel de l'API :
+   ```powershell
+   az containerapp show --name aml-api --resource-group $RG `
+      --query properties.configuration.ingress.fqdn -o tsv
+   ```
+3. Reporter cette adresse dans `deploy-web.yml` ligne 33 (préfixée de `https://`).
+4. **Seulement ensuite**, lancer le workflow de déploiement de l'interface.
+
+> `redeploy_api_azure.ps1` ne couvre pas ce cas : il se contente de mettre à jour
+> l'image d'une Container App **déjà existante** (`az containerapp update`).
+
+
+---
+
 ## 1. Objectif
 
 La conteneurisation (document 23) rendait le projet démarrable en une commande,

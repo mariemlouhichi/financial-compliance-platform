@@ -2,8 +2,10 @@
 // Rapport SAR STRUCTURÉ — rendu depuis sar_json (plus de markdown brut).
 // Une seule source de vérité : sarHtml() produit le HTML stylé, utilisé
 //   1. dans la modal (SarView, styles scopés)
-//   2. pour le PDF (printSar → fenêtre d'impression → « Enregistrer en PDF »)
+//   2. pour le PDF (printSar → impression navigateur → « Enregistrer en PDF »)
 // ============================================================================
+
+import { printHtml } from './printDoc';
 
 type Sar = Record<string, any>;
 
@@ -234,14 +236,10 @@ export function SarView({ sar }: { sar: Sar }) {
 
 /** Export PDF : fenêtre print-friendly → « Enregistrer au format PDF ». */
 export function printSar(sar: Sar, title: string) {
-  const w = window.open('', '_blank', 'noopener,width=920,height=720');
-  if (!w) return;
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8">
+  // iframe masquee : jamais bloquee par le navigateur (cf. printDoc.ts)
+  printHtml(`<!doctype html><html><head><meta charset="utf-8">
     <title>${esc(title)}</title>
     <style>body{font-family:'Segoe UI',system-ui,sans-serif;max-width:820px;
       margin:0 auto;padding:24px;}${SAR_CSS}</style></head>
-    <body>${sarHtml(sar)}
-    <script>window.onload = () => setTimeout(() => window.print(), 300);</script>
-    </body></html>`);
-  w.document.close();
+    <body>${sarHtml(sar)}</body></html>`);
 }

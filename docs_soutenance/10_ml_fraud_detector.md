@@ -37,23 +37,24 @@ que les règles avaient laissé passer.
 
 ---
 
-## 3. Architecture : dual-branch
+## 3. Architecture : tri-branch
 
-Le pipeline d'entraînement (`ml_fraud_detector_v4.py`) combine deux branches.
+Le pipeline d'entraînement (`ml_fraud_detector_v4.py`) combine trois branches :
+un classifieur supervisé nourri par deux détecteurs d'anomalies non supervisés.
 
 ```
                     ┌────────────────────────────────┐
-   transaction  →   │ BRANCHE A — supervisée          │
-                    │ LightGBM / XGBoost              │ → probabilité de fraude
+   transaction  →   │ BRANCHE A — supervisée          │ → probabilité de fraude
+                    │ LightGBM / XGBoost              │
                     │ (apprend sur les étiquettes)    │
                     └────────────────────────────────┘
-                                  ▲
-                                  │ reconstruction_error (feature)
-                    ┌────────────────────────────────┐
-   séquence des →   │ BRANCHE B — non supervisée      │
-   N dernières tx   │ LSTM-Autoencoder                │
-   du même compte   │ (apprend le comportement normal)│
-                    └────────────────────────────────┘
+                          ▲                          ▲
+   reconstruction_error   │                          │   isolation_score
+                    ┌──────────────────────┐  ┌──────────────────────────────┐
+   séquence du   →  │ BRANCHE B            │  │ BRANCHE C                     │  ←  transaction
+   même compte      │ LSTM-Autoencoder     │  │ Isolation Forest              │
+                    │ (comportement normal)│  │ (anomalie, même sans histor.) │
+                    └──────────────────────┘  └──────────────────────────────┘
 ```
 
 ### Branche A — supervisée
@@ -73,8 +74,21 @@ observe peu), on apprend à reproduire le **comportement normal** d'un compte.
 - L'**erreur de reconstruction** mesure à quel point la séquence est atypique.
 
 Une rafale *fan-out* produit une erreur élevée parce que le LSTM n'a jamais vu ce
-schéma pour ce compte. Cette erreur devient ensuite une **feature** de la branche
-A — les deux branches ne votent pas séparément, la seconde nourrit la première.
+schéma pour ce compte. Cette erreur devient ensuite une **feature** de la branche A.
+
+### Branche C — Isolation Forest
+
+Ajoutée en août 2026 (amélioration **A1**). Un *Isolation Forest* entraîné sur les
+transactions normales produit un `isolation_score` (0 = normal, 1 = atypique).
+Contrairement aux branches A et B, qui exigent un historique du compte, cette
+branche fournit un signal **non supervisé qui fonctionne pour tous les clients,
+même sans historique**. Ce score devient lui aussi une **feature** de la branche A
+et est affiché dans Pipeline Live (badge vert / ambre / rouge).
+
+Les branches B et C ne votent donc pas séparément : leurs signaux **nourrissent**
+le classifieur supervisé (branche A), qui produit la probabilité finale. Effet
+mesuré (A1) : séparation fraude/normal 1,40× (contre 0,69× avec l'autoencodeur
+seul).
 
 ---
 
@@ -89,7 +103,7 @@ A — les deux branches ne votent pas séparément, la seconde nourrit la premi�
 | Format de paiement | `fmt_ACH`, `fmt_Cash`, `fmt_Cheque`, `fmt_Bitcoin`… | Canal utilisé (le cash et le crypto sont plus risqués) |
 | Temporel | heure, jour de la semaine | Opérations nocturnes, week-end |
 | Comportemental | écart-type des montants de l'émetteur, vélocité | Rupture par rapport aux habitudes |
-| Anomalie | `reconstruction_error` | Sortie de la branche B |
+| Anomalie | `reconstruction_error`, `isolation_score` | Sorties des branches B et C |
 
 Les transformations `log` et `sqrt` du montant ne sont pas décoratives : les
 montants en AML suivent une distribution très étalée (de 50 TND à plusieurs
@@ -113,6 +127,11 @@ Matrice de confusion :
     Faux négatifs   (FN) :      60
     Vrais négatifs  (TN) : 118 952
 ```
+
+> **Mise à jour (août 2026)** — après l'ajout de la branche Isolation Forest
+> (amélioration A1), la configuration **tri-branche** mesure **PR-AUC 0,9518**
+> et **F1 0,9564** (voir document 22). Les chiffres ci-dessus correspondent à la
+> configuration précédente (deux branches).
 
 Lecture métier de ces chiffres :
 
@@ -207,9 +226,13 @@ Cette divergence est un outil de **supervision du modèle** : une divergence
 - **Biais temporel** : les features heure/jour ressortent souvent dans SHAP, ce
   qui traduit une particularité du jeu d'entraînement plus qu'une réalité métier.
   C'est identifié et assumé, et c'est précisément pourquoi le ML est subordonné.
-- **Pas de réentraînement automatique à ce stade** : les décisions du superviseur
-  sont collectées (voir document 21) mais la boucle de réentraînement planifié
-  reste à brancher.
+- **Réentraînement à partir du feedback superviseur** *(à jour, août 2026)* : la
+  boucle RLHF est désormais **fermée** (amélioration A6). Chaque validation du
+  superviseur devient un exemple étiqueté, et un réentraînement **incrémental**
+  (warm-start LightGBM) se déclenche, avec garde-fous : déploiement uniquement si
+  F1 et PR-AUC ne régressent pas, sinon *rollback* automatique. Voir document 22
+  (A6), `rlhf.py` et `retraining.py`. Le réentraînement **complet** (600k lignes
+  IBM + LSTM) reste le chemin lourd *offline*.
 
 ---
 

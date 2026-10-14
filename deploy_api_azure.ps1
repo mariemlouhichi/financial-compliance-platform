@@ -25,7 +25,6 @@ $acrPwd = (az acr credential show --name amlkyclouhichi2026 --query "passwords[0
 
 # ── 4. Secrets (noms en minuscules) + variables d'environnement ────────────
 $secrets = @(
-  "database-url=$dburl"
   "neo4j-password=$env:NEO4J_PASSWORD"
   "weaviate-key=$env:WEAVIATE_API_KEY"
   "redis-url=$env:REDIS_URL"
@@ -33,7 +32,6 @@ $secrets = @(
   "smtp-password=$($smtp.smtp_password)"
 )
 $envs = @(
-  "DATABASE_URL=secretref:database-url"
   "NEO4J_URI=$env:NEO4J_URI"
   "NEO4J_USER=$env:NEO4J_USER"
   "NEO4J_PASSWORD=secretref:neo4j-password"
@@ -48,6 +46,18 @@ $envs = @(
   "SMTP_PASSWORD=secretref:smtp-password"
   "SMTP_FROM=$($smtp.smtp_user)"
 )
+
+# ── 4bis. PostgreSQL : optionnel ───────────────────────────────────────────
+#  Sans AZURE_DATABASE_URL, api/store.py bascule seul sur la persistance
+#  fichiers (message « pas de DATABASE_URL → persistance fichiers JSON »).
+#  Les dossiers ne survivent alors pas au redémarrage du conteneur.
+if ($dburl) {
+    $secrets += "database-url=$dburl"
+    $envs    += "DATABASE_URL=secretref:database-url"
+    Write-Output "PostgreSQL : actif (persistance durable)."
+} else {
+    Write-Output "PostgreSQL : absent -> persistance fichiers (dossiers perdus au redemarrage)."
+}
 
 # ── 5. Créer la Container App ──────────────────────────────────────────────
 Write-Output "Création de l'application aml-api (l'image de 892 Mo est tirée depuis l'ACR par Azure)..."

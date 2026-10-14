@@ -6,9 +6,10 @@
 // + bandeau « pipeline de construction » qui met en valeur le travail :
 //   PDF → extraction → traduction → chunking → embeddings → Weaviate + Neo4j
 // ============================================================================
-import { useEffect, useState } from 'react';
-import { Search, BookOpen, Library, X, FileText, FileDown, ExternalLink, Network } from 'lucide-react';
-import { api } from '../api/client';
+import { useEffect, useRef, useState } from 'react';
+import { Search, BookOpen, Library, X, FileText, FileDown, ExternalLink, Network,
+         UploadCloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { api, type RegulationIngestJob } from '../api/client';
 import type { Chunk, CorpusDocument, CorpusChunkMeta, CorpusFile } from '../types/api';
 import { PageHeader } from '../components/Layout';
 import { Card, StatTile, EmptyState, Spinner } from '../components/ui';
@@ -63,7 +64,7 @@ function PipelineStrip({ docs, chunks }: { docs: number; chunks: number }) {
   );
 }
 
-type Tab = 'biblio' | 'structure' | 'recherche';
+type Tab = 'biblio' | 'structure' | 'recherche' | 'upload';
 
 export function RegulationsPage() {
   // ── Neo4j : documents structurés ────────────────────────────────────
@@ -124,6 +125,7 @@ export function RegulationsPage() {
     { key: 'biblio', label: `Bibliothèque (${files?.length ?? '…'})`, Icon: Library },
     { key: 'structure', label: 'Structure Neo4j', Icon: Network },
     { key: 'recherche', label: 'Recherche hybride', Icon: Search },
+    { key: 'upload', label: 'Ajouter un règlement', Icon: UploadCloud },
   ];
 
   return (
@@ -376,6 +378,210 @@ export function RegulationsPage() {
           </div>
         </>
       )}
+
+      {/* ══ Onglet 4 : AJOUTER UN RÈGLEMENT ═══════════════════════════ */}
+      {tab === 'upload' && <UploadRegulationTab />}
     </>
+  );
+}
+
+// ── Onglet Upload : ingestion d'un nouveau règlement à la demande ────────
+//  PDF → extraction → (traduction FR→EN) → chunking → embeddings → Weaviate.
+//  Le document devient immédiatement interrogeable par le Retrieval Agent.
+const STAGE_FR: Record<string, string> = {
+  queued: 'en file', extraction: 'extraction du PDF',
+  traduction: 'traduction FR → EN', concat: 'assemblage des pages',
+  chunking: 'découpage réglementaire', embedding: 'vectorisation (BGE)',
+  indexation: 'indexation Weaviate', done: 'terminé', error: 'erreur',
+};
+
+function UploadRegulationTab() {
+  const [file, setFile] = useState<File | null>(null);
+  const [jurisdiction, setJurisdiction] = useState<'international' | 'tunisia'>('international');
+  const [translate, setTranslate] = useState(true);
+  const [job, setJob] = useState<RegulationIngestJob | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
+  const submit = async () => {
+    if (!file) return;
+    setErr(''); setBusy(true); setJob(null);
+    try {
+      const b64 = await new Promise<string>((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result));
+        r.onerror = () => rej(new Error('lecture du fichier impossible'));
+        r.readAsDataURL(file);
+      });
+      const { job_id } = await api.uploadRegulation({
+        filename: file.name, content_b64: b64, jurisdiction, translate,
+      });
+      // Sondage du statut toutes les 2 s
+      pollRef.current = setInterval(async () => {
+        try {
+          const st = await api.regulationUploadStatus(job_id);
+          setJob(st);
+          if (st.status !== 'RUNNING') {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setBusy(false);
+          }
+        } catch { /* transitoire */ }
+      }, 2000);
+    } catch (e) {
+      setErr(String(e instanceof Error ? e.message : e));
+      setBusy(false);
+    }
+  };
+
+  const reset = () => {
+    setFile(null); setJob(null); setErr('');
+    if (inputRef.current) inputRef.current.value = '';
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {/* Formulaire */}
+      <Card title="Ingestion d'un nouveau règlement"
+            subtitle="PDF → extraction → traduction → chunking → embeddings → Weaviate (RAG)">
+        <div className="space-y-4">
+          {/* Zone de dépôt */}
+          <button onClick={() => inputRef.current?.click()} disabled={busy}
+            className="flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/60 px-4 py-8 text-center hover:border-indigo-400 hover:bg-indigo-50/40 disabled:opacity-50">
+            <UploadCloud size={28} className="text-slate-400" />
+            {file ? (
+              <span className="text-sm font-semibold text-slate-800">
+                <FileText size={13} className="mr-1 inline text-red-500" />{file.name}
+              </span>
+            ) : (
+              <>
+                <span className="text-sm font-semibold text-slate-700">Choisir un PDF réglementaire</span>
+                <span className="text-[11px] text-slate-400">loi, circulaire BCT, directive UE, guidance FATF… (max 40 Mo)</span>
+              </>
+            )}
+          </button>
+          <input ref={inputRef} type="file" accept="application/pdf" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) { setFile(f); setJob(null); setErr(''); } }} />
+
+          {/* Options */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-xs">
+              <span className="mb-1 block font-semibold text-slate-600">Juridiction</span>
+              <select value={jurisdiction} disabled={busy}
+                onChange={e => setJurisdiction(e.target.value as 'international' | 'tunisia')}
+                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs focus:border-indigo-400 focus:outline-none">
+                <option value="international">🌐 International (FATF · UE · Bâle)</option>
+                <option value="tunisia">⚖️ Tunisie (BCT · loi · CTAF)</option>
+              </select>
+            </label>
+            <label className="flex cursor-pointer items-end gap-2 pb-1 text-xs">
+              <input type="checkbox" checked={translate} disabled={busy}
+                onChange={e => setTranslate(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300" />
+              <span className="text-slate-600">
+                Traduire FR → EN
+                <span className="block text-[10px] text-slate-400">le corpus + les embeddings sont en anglais</span>
+              </span>
+            </label>
+          </div>
+
+          <div className="flex gap-2">
+            <button onClick={submit} disabled={!file || busy}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40">
+              {busy ? <><Loader2 size={15} className="animate-spin" /> Ingestion en cours…</>
+                    : <><UploadCloud size={15} /> Lancer l'ingestion</>}
+            </button>
+            {(file || job) && !busy && (
+              <button onClick={reset}
+                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                Réinitialiser
+              </button>
+            )}
+          </div>
+
+          {err && (
+            <p className="flex items-start gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              <AlertCircle size={14} className="mt-0.5 shrink-0" /> {err}
+            </p>
+          )}
+
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+            ⓘ Le règlement est ajouté <b>en direct</b> à la base vectorielle (interrogeable
+            immédiatement par le RAG). Un <code className="rounded bg-slate-200 px-1">embed_to_weaviate.py --fresh</code>{' '}
+            repartirait du corpus d'origine — ré-uploader si besoin.
+          </p>
+        </div>
+      </Card>
+
+      {/* Suivi / résultat */}
+      <Card title="Suivi de l'ingestion"
+            subtitle="Chaque étape du pipeline, en temps réel">
+        {!job && !busy && (
+          <EmptyState>Choisis un PDF et lance l'ingestion — le suivi s'affichera ici.</EmptyState>
+        )}
+
+        {(busy || (job && job.status === 'RUNNING')) && (
+          <div className="flex items-center gap-2.5 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2.5 text-sm">
+            <Loader2 size={16} className="animate-spin text-indigo-600" />
+            <span className="font-medium text-indigo-800">
+              {STAGE_FR[job?.stage ?? 'queued'] ?? job?.stage ?? 'démarrage…'}
+            </span>
+            {job?.detail && <span className="text-xs text-indigo-500">· {job.detail}</span>}
+          </div>
+        )}
+
+        {job?.status === 'ERROR' && (
+          <p className="flex items-start gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+            <AlertCircle size={14} className="mt-0.5 shrink-0" /> {job.error ?? 'échec de l’ingestion'}
+          </p>
+        )}
+
+        {job?.status === 'DONE' && job.result && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm">
+              <CheckCircle2 size={16} className="text-emerald-600" />
+              <span className="font-semibold text-emerald-800">
+                {job.result.doc_name.replace(/\.pdf$/i, '')} ingéré en {job.result.elapsed_s}s
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <StatTile label="Pages" value={job.result.pages} />
+              <StatTile label="Chunks indexés" value={job.result.chunks_indexed} />
+              <StatTile label="Seuils détectés" value={job.result.thresholds} />
+            </div>
+            {job.result.pages_translated > 0 && (
+              <p className="text-[11px] text-slate-500">
+                🌐 {job.result.pages_translated} page(s) traduite(s) FR → EN
+              </p>
+            )}
+            {job.result.preview.length > 0 && (
+              <div>
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                  Aperçu des chunks créés
+                </p>
+                <div className="space-y-1.5">
+                  {job.result.preview.map((c, i) => (
+                    <div key={i} className="rounded-lg border border-slate-100 bg-slate-50/60 px-2.5 py-1.5">
+                      <p className="text-[11px] font-semibold text-slate-700">
+                        {c.article_ref || 'sans référence'}
+                        <span className="ml-1.5 font-normal text-slate-400">· {c.chunk_role}</span>
+                      </p>
+                      <p className="text-[11px] leading-snug text-slate-500">{c.text}…</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="rounded-lg bg-indigo-50/60 px-3 py-2 text-[11px] text-indigo-700">
+              ✓ Ce règlement est maintenant interrogeable — teste-le dans l'onglet{' '}
+              <b>Recherche hybride</b> ou via une nouvelle transaction.
+            </p>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }

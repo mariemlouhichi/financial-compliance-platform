@@ -12,6 +12,56 @@ import type {
 } from '../types/api';
 import { getSession, type Role } from '../auth';
 
+/** Boucle RLHF — résumé pour le panneau d'amélioration continue. */
+export interface RlhfSummary {
+  stats: {
+    total_events: number; labelled: number; correct: number;
+    false_positive: number; true_fraud: number;
+    agreement_rate: number; false_positive_rate: number;
+  };
+  model: {
+    threshold?: number; metrics?: Record<string, number>;
+    last_rlhf?: { at: string; warm_rounds: number; feedback_used: number } | null;
+  };
+  thresholds: { min_labels: number; fp_alert: number };
+  last_cycle: Record<string, unknown>;
+}
+
+/** Rapport d'un cycle RLHF (agrégation → décision → warm-start garde-fou). */
+export interface RlhfCycleReport {
+  cycle_at: string;
+  stats: {
+    labelled: number; correct: number; false_positive: number; true_fraud: number;
+    agreement_rate: number; false_positive_rate: number; new_since_last_cycle: number;
+  };
+  decision: { retrain: boolean; reason: string };
+  training: {
+    status: string; detail?: string; reason?: string; deployed: boolean;
+    metrics_before?: Record<string, number>;
+    metrics_after?: Record<string, number>;
+    feedback?: { usable: number; positives: number; negatives: number; missing_features: number };
+    warm_rounds?: number; val_rows?: number; duration_s?: number;
+  };
+  thresholds: { min_labels: number; fp_alert: number };
+}
+
+/** Statut d'un job d'ingestion de règlement (upload → Weaviate). */
+export interface RegulationIngestJob {
+  job_id: string;
+  status: 'RUNNING' | 'DONE' | 'ERROR';
+  stage: string;
+  detail?: string;
+  doc_name: string;
+  jurisdiction?: string;
+  error?: string;
+  result?: {
+    doc_name: string; jurisdiction: string; pages: number;
+    pages_translated: number; chunks: number; chunks_indexed: number;
+    roles: Record<string, number>; thresholds: number; elapsed_s: number;
+    preview: { article_ref: string; chunk_role: string; text: string }[];
+  };
+}
+
 const BASE: string =
   (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL
   ?? 'http://localhost:8001';
@@ -157,6 +207,15 @@ export const api = {
     get<{ query: string; results: Chunk[] }>(
       `/api/regulations/search?q=${encodeURIComponent(q)}&top_k=${topK}`),
 
+  // ── Upload d'un nouveau règlement (ingestion à la demande) ────────────
+  uploadRegulation: (body: {
+    filename: string; content_b64: string;
+    jurisdiction: string; translate: boolean;
+  }) => post<{ job_id: string; status: string }>('/api/regulations/upload', body),
+
+  regulationUploadStatus: (jobId: string) =>
+    get<RegulationIngestJob>(`/api/regulations/upload/${jobId}`),
+
   // ── Simulateur de flux bancaire (espace admin) ────────────────────────
   simulatorStart: (intervalSeconds = 30) =>
     post<{ running: boolean; interval_seconds?: number; note?: string }>(
@@ -207,6 +266,12 @@ export const api = {
   // ── Justificatif (upload base64 + analyse de conformité) ──────────────
   uploadJustificatif: (txId: string, body: { filename: string; content_b64: string }) =>
     post<JustificatifResult>(`/api/justificatif/${txId}`, body),
+
+  // ── RLHF — boucle d'amélioration continue (feedback superviseur) ──────
+  rlhfSummary: () => get<RlhfSummary>('/api/rlhf/summary'),
+
+  rlhfRun: (force = false) =>
+    post<RlhfCycleReport>(`/api/rlhf/run?force=${force}`, {}),
 
   // ── Listes FATF (alertes métier du formulaire) ────────────────────────
   fatfLists: () =>

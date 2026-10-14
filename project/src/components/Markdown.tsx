@@ -1,9 +1,11 @@
 // ============================================================================
 // Mini-rendu Markdown maison (zéro dépendance) — couvre la syntaxe utilisée
 // par les rapports SAR : titres, gras/italique/code, tableaux, listes,
-// citations, règles horizontales. + export PDF via fenêtre d'impression
+// citations, règles horizontales. + export PDF via impression navigateur
 // (le navigateur propose « Enregistrer au format PDF »).
 // ============================================================================
+
+import { printHtml } from './printDoc';
 
 function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -115,18 +117,9 @@ export function MarkdownView({ md }: { md: string }) {
 }
 
 /** Export PDF : ouvre une fenêtre print-friendly → « Enregistrer en PDF ». */
-export function printMarkdown(md: string, title: string, win?: Window | null) {
-  // IMPORTANT : ne PAS passer 'noopener' à window.open — cela ferait renvoyer
-  // `null` (fenêtre blanche non pilotable). On peut aussi recevoir une fenêtre
-  // déjà ouverte (`win`) : indispensable quand l'appel suit un `await`, sinon
-  // le navigateur bloque l'ouverture (hors geste utilisateur direct).
-  const w = win ?? window.open('', '_blank', 'width=900,height=700');
-  if (!w) return;
-  w.document.open();
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8">
+export function printMarkdown(md: string, title: string, _win?: Window | null) {
+  // iframe masquee : jamais bloquee par le navigateur (cf. printDoc.ts)
+  printHtml(`<!doctype html><html><head><meta charset="utf-8">
     <title>${esc(title)}</title><style>${MD_CSS}</style></head>
-    <body>${mdToHtml(md)}
-    <script>window.onload = () => setTimeout(() => window.print(), 300);</script>
-    </body></html>`);
-  w.document.close();
+    <body>${mdToHtml(md)}</body></html>`);
 }

@@ -97,16 +97,12 @@ export function RulesPage() {
       )}
 
       {/* ── KPIs ────────────────────────────────────────────────────── */}
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <StatTile label="Règles ground truth" value={counts.gt}
           hint="validées humainement (référence absolue)" />
         <StatTile label="Apprises par le RAG" value={counts.learned}
           tone={counts.learned > 0 ? 'warning' : 'default'}
           hint="persistées après validation SPO — s'accumulent" />
-        <StatTile label="Couverture FATF" value="94,7 %"
-          hint="éval 100 scénarios générés (compliance-only)" />
-        <StatTile label="Hallucination" value="0 %" tone="success"
-          hint="gate B4 : snippet verbatim exigé (avant : 10,3 %)" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

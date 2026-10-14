@@ -1,0 +1,10 @@
+# Les fichiers interprétés par un shell Linux (conteneurs) DOIVENT rester en LF.
+# Sans cette règle, git checkout sous Windows les convertit en CRLF et le build
+# Docker échoue avec « /bin/sh: set: Illegal option - » (le \r est lu comme un
+# argument).
+Dockerfile      text eol=lf
+*.Dockerfile    text eol=lf
+*.sh            text eol=lf
+*.conf          text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf

@@ -82,6 +82,11 @@ RRF_K            = 60    # Step 3 — paramètre RRF (standard académique)
 FUSION_TOP_K     = 15    # Step 3 — résultats après fusion
 EXPANSION_DEPTH  = 1     # Step 4 — articles voisins (±1 NEXT_IN_DOC)
 FINAL_TOP_K      = 5     # Step 5 — résultats finaux
+# Step 5 — seuil de pertinence du reranker : on écarte les extraits dont le
+# score BGE est sous ce seuil (réduction du bruit → meilleure Context Precision).
+# Réglable sans toucher au code : $env:RERANK_MIN_SCORE = "0.5"
+RERANK_MIN_SCORE = float(os.getenv("RERANK_MIN_SCORE", "0.0"))
+RERANK_MIN_KEEP  = int(os.getenv("RERANK_MIN_KEEP",  "2"))   # garde min (jamais vider)
 CACHE_MIN_RULES  = 3     # Step 0 — seuil cache hit
 SOURCE_DOC_FILTER_MAX = 25  # Step 1 — n'applique le filtre source_doc que si <25 docs
 NEIGHBOR_TEXT_MAX     = 500 # Step 4 — max chars par voisin
@@ -848,7 +853,13 @@ class RetrievalPipeline:
                 r.score = float(scores[i])
                 r.retrieval_path += "+reranked"
             results.sort(key=lambda x: -x.score)
-            return results[:top_k]
+            # Seuil de pertinence : on écarte les extraits trop faibles (bruit)
+            # → améliore la Context Precision. On garde toujours au moins
+            # RERANK_MIN_KEEP extraits pour ne jamais priver le pipeline.
+            kept = [r for r in results if r.score >= RERANK_MIN_SCORE]
+            if len(kept) < RERANK_MIN_KEEP:
+                kept = results[:RERANK_MIN_KEEP]
+            return kept[:top_k]
         except Exception as e:
             logger.warning(f"Reranking failed: {e}")
             return results[:top_k]

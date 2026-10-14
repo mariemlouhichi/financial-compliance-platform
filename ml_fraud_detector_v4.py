@@ -1106,6 +1106,7 @@ def evaluate_model(name, model, X_test, y_test, threshold=None):
     rec    = recall_score(y_test, y_pred, zero_division=0)
     cm     = confusion_matrix(y_test, y_pred)
     tn,fp,fn,tp = cm.ravel()
+    
 
     print(f"\n  ─── {name} (seuil={threshold:.3f}) ───")
     print(f"  PR-AUC     : {pr_auc:.4f}  ← métrique principale")

@@ -186,8 +186,12 @@ class Validator:
             for r in rows:
                 icon = {"agent_extracted": "🤖", "human_verified": "👤",
                         "agent_validated": "✓"}.get(r["origin"], "?")
-                print(f"    {icon} {r['id']:<20} {r['sev']:<10} "
-                      f"conf={r['conf']:.2f} — {r['name'][:40]}")
+                # Les règles de vérité terrain n'ont ni severity ni confidence
+                # (ces champs appartiennent aux règles extraites par l'agent).
+                sev  = r['sev']  or "—"
+                conf = f"{r['conf']:.2f}" if r['conf'] is not None else "—"
+                name = (r['name'] or "")[:40]
+                print(f"    {icon} {r['id']:<20} {sev:<10} conf={conf} — {name}")
         else:
             print(f"\n  [Q5] Couche règles vide — lancer demo_agent_extraction.py")
 

@@ -253,3 +253,112 @@ une démarche de test et pas seulement de développement.
 | Règles hors sujet remontées | Cache graphe non discriminant | Condition `OR` trop permissive | Comptage de mots-clés |
 | Historique perdu au redémarrage | Dossiers disparus | Stockage 100 % en mémoire | Persistance fichiers puis PostgreSQL |
 | SAR PDF vide | Fenêtre blanche | `noopener` renvoie `null` + ouverture après `await` | Fenêtre ouverte dans le clic, sans `noopener` |
+
+---
+
+# Améliorations d'août 2026 (dernière itération)
+
+> Six améliorations menées après la documentation de juin, chacune ciblée
+> (« améliorer l'existant, pas refaire »). Elles renforcent trois axes : la
+> **détection**, la **fiabilité prouvable**, et l'**apprentissage**.
+
+## A1 — Détection d'anomalies non supervisée (Isolation Forest)
+
+**Le manque.** Le ML supervisé (LightGBM) et le LSTM-Autoencoder ont besoin
+d'historique. Un **nouveau client** (sans historique) ne bénéficiait d'aucun
+signal comportemental fiable.
+
+**L'ajout.** Une **branche C** dans `ml_fraud_detector_v4.py` (au *training*) :
+un Isolation Forest entraîné sur les transactions normales produit un
+`isolation_score` (0 = normal, 1 = atypique) — un signal **non supervisé** qui
+fonctionne **pour tous les clients, même sans historique**. La feature est
+intégrée au vecteur du modèle et affichée dans Pipeline Live (badge vert/ambre/
+rouge).
+
+**Effet vérifié** : séparation fraude/normal 1,40× (l'ancien autoencodeur seul
+donnait 0,69×) ; PR-AUC 0,9518, F1 0,9564.
+
+## A2 — Précision du contexte (resserrage du reranking)
+
+**Le manque.** Le reranker gardait les 5 meilleurs extraits sans seuil de score
+→ des passages peu pertinents « diluaient » le contexte transmis au LLM.
+
+**L'ajout.** Un **seuil de score** après reranking (`RERANK_MIN_SCORE`), avec un
+plancher de sécurité (`RERANK_MIN_KEEP = 2`) pour ne jamais renvoyer le vide.
+
+**Effet mesuré** (RAGAS-like) : *Context Precision* 67,3 % → **73,3 %**,
+*Faithfulness* 81,4 % → **86,3 %**, Hit-Rate stable à 91,7 %, latence divisée
+par deux. Compromis assumé : 9/12 questions répondues (vs 11/12) — on préfère
+**moins mais plus juste**.
+
+## A3 — Juge de qualité des règles (validation en 2 étapes)
+
+**Le manque.** Une règle sémantique n'était filtrée que par l'ancrage verbatim.
+Un texte **descriptif** (définition, contexte) ancré mot-à-mot pouvait polluer
+le graphe comme si c'était une obligation.
+
+**L'ajout.** Un **2ᵉ garde-fou** dans `SemanticReasoner._persist_validated` : un
+juge LLM (`_rule_quality_ok`, piloté par `RULE_QUALITY_JUDGE`) distingue une
+**vraie obligation déontique** (« doit / ne doit pas ») d'un texte descriptif.
+Repli sûr : si le juge est indisponible, on laisse passer (l'ancrage fait foi).
+
+**Effet vérifié** : sur 4 cas de test, les 2 obligations sont gardées, les 2
+textes descriptifs rejetés. Le graphe ne se peuple que de vraies règles.
+
+## A4 — Visualisation structurée des règles + citation verbatim
+
+**Le manque.** La page Compliance n'affichait qu'une ligne tronquée par
+violation ; les obligations **respectées** (pourtant renvoyées par l'API)
+n'étaient pas montrées ; aucune citation de loi visible.
+
+**L'ajout.** Une **carte règle** structurée (composant `RuleCard`) : bandeau
+typé (sévérité · catégorie · provenance 🔷 graphe / 🔶 LLM · rec. FATF · statut
+cycle de vie), l'obligation, la provenance (source → article → seuil), et
+surtout la **citation verbatim** ❝ … ❞ du texte de loi + barre de confiance. Les
+règles sont groupées en deux sections (violations / respectées). Les règles du
+graphe portent aussi leur extrait ancré (`source_text_snippet`).
+
+En complément, un compteur **anti-hallucination** est exposé : « N règles LLM
+rejetées (citation non ancrée) » — la garantie 0 % hallucination devient
+**visible** à l'écran, pas seulement affirmée.
+
+## A5 — Upload de règlements à la demande (ingestion Weaviate)
+
+**L'ajout.** Une interface (onglet « Ajouter un règlement » de la page Corpus)
+permet d'**uploader un PDF réglementaire** ; le backend le fait passer par le
+**même pipeline** que les 33 documents d'origine — extraction → traduction
+FR→EN si nécessaire → chunking (Pattern Scanner + Branch A/B) → embeddings
+BGE → **insertion incrémentale dans Weaviate**. Le document devient
+immédiatement interrogeable par le Retrieval Agent (chemin sémantique). Choix
+assumé : ingestion **vectorielle uniquement** (pas d'intégration dans la partie
+symbolique/Neo4j), traitée en tâche de fond avec suivi temps réel.
+Fichiers : `ingest_document.py`, endpoints `/api/regulations/upload`.
+
+## A6 — Boucle RLHF fermée (apprentissage à partir du feedback superviseur)
+
+**Le manque.** Le feedback superviseur était capturé (`supervisor_feedback.jsonl`)
+et mesuré, mais le **réentraînement ne s'exécutait pas** (étape préparée puis
+laissée manuelle), et le feedback n'alimentait pas les données d'entraînement.
+
+**L'ajout.** La boucle est **fermée** et rendue **visible** :
+
+1. **feedback → dataset** : chaque transaction validée devient un exemple
+   étiqueté (features ML persistées + label déduit du verdict humain).
+2. **Réentraînement INCRÉMENTAL (warm-start)** : on **repart du modèle existant**
+   (LightGBM `init_model`) et on ajoute quelques itérations de boosting sur le
+   feedback + un *replay buffer* → rapide (secondes), **sans oubli catastrophique**.
+3. **Garde-fous** (conformes à la politique existante) : volume minimum
+   (≥ 20 étiquettes), **déploiement seulement si F1 et PR-AUC ne régressent pas**
+   (sinon rollback avec sauvegarde `.bak`), et **trace auditable** par cycle.
+4. **Cadence hybride** : cycle hebdomadaire + garde-fou de dérive quotidien.
+5. **Panneau UI** (page Superviseur) : accord système/expert, taux de fausses
+   alertes, seuil courant, bouton « Lancer un cycle » et tableau **avant/après**
+   avec verdict *Déployé / Rollback*.
+
+Le réentraînement **complet** (600k lignes IBM + LSTM) reste le chemin lourd
+*offline*, nourri par le dataset accumulé.
+Fichiers : `rlhf.py`, `retraining.py`, endpoints `/api/rlhf/*`.
+
+**À dire au jury** : *« Le système apprend du feedback humain sans se dégrader —
+un garde-fou peut refuser un modèle qui régresse : c'est une fonctionnalité, pas
+un bug. »*
