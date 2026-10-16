@@ -7,7 +7,7 @@
 #  et poussée.
 #
 #  Prérequis : Docker démarré · az login · platform_seed.db généré
-#              (`python seed_accounts.py`).
+#              (`python scripts/seed_accounts.py`).
 #  Usage :  .\redeploy_api_azure.ps1
 # ============================================================================
 $ErrorActionPreference = "Stop"
@@ -18,7 +18,7 @@ $img = "$ACR.azurecr.io/aml-api:latest"
 
 # ── 0. Garde-fou : la base des comptes doit exister (le Dockerfile la copie) ─
 if (-not (Test-Path ".\platform_seed.db")) {
-    throw "platform_seed.db introuvable. Lance d'abord : python seed_accounts.py"
+    throw "platform_seed.db introuvable. Lance d'abord : python scripts/seed_accounts.py"
 }
 
 # ── 1. Build (image simple, couches lourdes en cache) ──────────────────────

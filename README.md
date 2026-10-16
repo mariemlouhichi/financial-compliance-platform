@@ -118,6 +118,27 @@ Le dépôt contient une centaine de modules. Voici les huit fichiers qui portent
 
 ---
 
+## Structure du dépôt
+
+```
+.                        les 19 modules du pipeline d'analyse
+├── api/                 l'API FastAPI et son orchestrateur
+├── level1_rules/        les règles déterministes (sanctions, seuils, pays)
+├── neo4j_graph/         le graphe de connaissances réglementaire
+├── core/                utilitaires partagés (découpage, classification)
+├── config/              paramètres et seuils
+├── project/             l'interface React
+├── scripts/             outils hors ligne : corpus, entraînement, évaluation, exploitation
+├── tests/               tests unitaires et d'intégration
+├── docs/                documentation technique et guides
+└── data/ · output/      jeux de données et résultats d'exécution
+```
+
+Les modules de la racine sont ceux que l'API importe directement : ils forment la
+chaîne d'analyse. Tout ce qui s'exécute en dehors du service tourne dans `scripts/`.
+
+---
+
 ## Documentation
 
 - [Architecture technique](docs/architecture-technique.md) — la conception en détail

@@ -35,7 +35,7 @@ else {
         $r = Invoke-RestMethod "http://localhost:8088/v1/graphql" -Method Post -ContentType "application/json" -Body $body
         $n = $r.data.Aggregate.AMLChunk[0].meta.count
         Write-Host "  OK Weaviate local : $n chunks dans AMLChunk" -ForegroundColor Green
-        if ($n -eq 0) { Write-Host "  ! Collection vide — relance : .\venv\Scripts\python.exe embed_to_weaviate.py --fresh" -ForegroundColor Yellow }
+        if ($n -eq 0) { Write-Host "  ! Collection vide — relance : .\venv\Scripts\python.exe scripts/embed_to_weaviate.py --fresh" -ForegroundColor Yellow }
     } catch { Write-Host "  ! Comptage impossible : $($_.Exception.Message)" -ForegroundColor Yellow }
 }
 

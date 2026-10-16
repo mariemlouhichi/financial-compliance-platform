@@ -115,7 +115,7 @@ COPY aml_ml_demo_*   ./
 COPY clients_db.json fatf_checklist_cache.json ./
 COPY output/chunks_aml_kyc.json ./output/
 
-# Comptes de démonstration pré-vérifiés (généré par seed_accounts.py).
+# Comptes de démonstration pré-vérifiés (généré par scripts/seed_accounts.py).
 # Sur Azure Container Apps le stockage est éphémère et platform.db n'est PAS
 # monté → ces comptes survivent aux redémarrages. En local, docker-compose monte
 # le vrai platform.db, qui prend le dessus sur celui-ci.

@@ -65,7 +65,7 @@ jobs:
 
       - name: Compilation de tous les modules Python
         run: |
-          python -m compileall -q api level1_rules neo4j_graph
+          python -m compileall -q api level1_rules neo4j_graph core config scripts tests
           python -m compileall -q -l .
 
       - name: Cohérence des fichiers de dépendances
